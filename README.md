@@ -1,2 +1,0 @@
-# velora
-app

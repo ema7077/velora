@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>VELORA — International Luxury Beauty & Salon SaaS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // Configure Tailwind luxury color palette and typography tokens
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#FAF7F2',
+            beige: '#F2ECE1',
+            sand: '#E6DDD0',
+            taupe: '#8C7D70',
+            espresso: '#2C221E',
+            champagne: '#B89B72',
+            champagneDark: '#9A7E56',
+          },
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          boxShadow: {
+            luxury: '0 10px 30px -10px rgba(44, 34, 30, 0.08)',
+            card: '0 4px 20px -2px rgba(44, 34, 30, 0.05)',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: #EFE9DF;
+      color: #2C221E;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .font-serif-editorial { font-family: 'Cormorant Garamond', Georgia, serif; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #B89B72;
+      box-shadow: 0 0 0 3px rgba(184, 155, 114, 0.15);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start md:py-6 md:px-4">
+
+  <!-- Top Control Bar for Switching Roles, Frame Mode, and Language -->
+  <div class="w-full max-w-[1180px] mb-3 px-4 md:px-0 pt-3 md:pt-0 flex flex-wrap items-center justify-between gap-2 text-xs text-espresso/80">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-champagne"></span>
+      <span class="font-semibold tracking-widest uppercase text-[11px]">VELORA MVP v1.0</span>
+      <span class="hidden sm:inline text-taupe">• International Beauty Marketplace & Direct-Payout Salon SaaS</span>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-1.5">
+      <div class="inline-flex rounded-full bg-ivory border border-sand p-0.5 shadow-sm">
+        <button onclick="switchRole('onboarding')" id="role-btn-onboarding" class="role-pill px-2.5 py-1 rounded-full text-[11px] font-medium transition">Onboarding</button>
+        <button onclick="switchRole('customer')" id="role-btn-customer" class="role-pill px-2.5 py-1 rounded-full text-[11px] font-medium transition">Client App</button>
+        <button onclick="switchRole('owner')" id="role-btn-owner" class="role-pill px-2.5 py-1 rounded-full text-[11px] font-medium transition">Salon Portal</button>
+        <button onclick="switchRole('platform')" id="role-btn-platform" class="role-pill px-2.5 py-1 rounded-full text-[11px] font-medium transition flex items-center gap-1">
+          <span>Platform Revenue</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+        </button>
+      </div>
+
+      <button onclick="toggleViewportMode()" id="viewport-toggle-btn" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-ivory border border-sand text-[11px] font-medium hover:bg-beige transition">
+        <span id="viewport-icon">📱</span>
+        <span id="viewport-label">Mobile Frame</span>
+      </button>
+
+      <div class="inline-flex rounded-full bg-ivory border border-sand p-0.5">
+        <button onclick="setLanguage('en')" id="lang-en" class="px-2 py-0.5 rounded-full text-[11px] font-semibold transition">EN</button>
+        <button onclick="setLanguage('hr')" id="lang-hr" class="px-2 py-0.5 rounded-full text-[11px] font-semibold transition">HR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Responsive Application Shell -->
+  <div id="app-shell" class="w-full max-w-[440px] min-h-[840px] md:min-h-[820px] bg-ivory md:rounded-[32px] md:border md:border-sand shadow-luxury flex flex-col overflow-hidden relative transition-all duration-300">
+
+    <!-- Persistent App Header -->
+    <header id="app-header" class="sticky top-0 z-30 bg-ivory/95 backdrop-blur-md border-b border-sand/70 px-5 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <button id="header-back-btn" onclick="goBack()" class="hidden w-8 h-8 rounded-full bg-beige/80 hover:bg-sand/70 flex items-center justify-center text-espresso transition" aria-label="Back">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <div onclick="handleLogoClick()" class="cursor-pointer">
+          <div class="font-serif-editorial text-2xl font-semibold tracking-[0.18em] text-espresso leading-none">VELORA</div>
+          <div id="header-subtitle" class="text-[10px] uppercase tracking-[0.2em] text-taupe mt-0.5">Maison de Beauté</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <select id="screen-navigator" onchange="navigateTo(this.value)" aria-label="Jump to screen" class="text-[11px] bg-beige/90 border border-sand rounded-full px-2.5 py-1.5 text-espresso font-medium max-w-[155px] truncate cursor-pointer">
+          <optgroup label="Onboarding & Auth">
+            <option value="welcome">1. Welcome & Onboarding</option>
+            <option value="auth">2. Sign Up & Login</option>
+          </optgroup>
+          <optgroup label="Customer Experience">
+            <option value="home">3. Customer Home</option>
+            <option value="search">4. Search & Filters</option>
+            <option value="salonProfile">5. Salon Profile</option>
+            <option value="servicesMenu">6. Services & Prices</option>
+            <option value="dateTime">7. Date & Time</option>
+            <option value="bookingConfirm">8. Booking Confirmation</option>
+            <option value="myBookings">9. My Bookings</option>
+            <option value="customerProfile">10. Customer Profile</option>
+          </optgroup>
+          <optgroup label="Salon Owner Portal">
+            <option value="salonRegister">11. Salon Registration</option>
+            <option value="salonDashboard">12. Salon Dashboard</option>
+            <option value="servicesManage">13. Services Management</option>
+            <option value="staffManage">14. Staff Management</option>
+            <option value="bookingCalendar">15. Booking Calendar</option>
+            <option value="businessSettings">16. Business & Billing</option>
+          </optgroup>
+          <optgroup label="Platform Owner (You)">
+            <option value="platformRevenue">★ Direct Payouts & MRR</option>
+          </optgroup>
+        </select>
+      </div>
+    </header>
+
+    <!-- Scrollable Screen Viewport -->
+    <main id="screen-container" class="flex-1 overflow-y-auto no-scrollbar pb-24"></main>
+
+    <!-- Persistent Bottom Navigation -->
+    <nav id="bottom-nav" class="sticky bottom-0 z-30 bg-ivory/95 backdrop-blur-md border-t border-sand px-3 py-2 flex items-center justify-around"></nav>
+
+    <!-- Non-blocking Toast Banner -->
+    <div id="toast-banner" class="pointer-events-none fixed bottom-20 left-1/2 -translate-x-1/2 z-50 opacity-0 transition-all duration-300 translate-y-3">
+      <div class="bg-espresso text-ivory px-4 py-2.5 rounded-full shadow-xl border border-champagne/40 text-xs font-medium flex items-center gap-2 whitespace-nowrap">
+        <span class="w-2 h-2 rounded-full bg-champagne"></span>
+        <span id="toast-message">Notification</span>
+      </div>
+    </div>
+
+    <!-- Modal Dialog Container -->
+    <div id="modal-overlay" class="hidden fixed inset-0 z-50 bg-espresso/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div id="modal-box" class="bg-ivory w-full max-w-[440px] rounded-t-[28px] sm:rounded-[28px] border border-sand p-6 shadow-2xl max-h-[90vh] overflow-y-auto fade-in"></div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. LOCALIZATION DICTIONARY (EN DEFAULT + HR + EXTENSIBLE LOCALE STRUCTURE)
+    // =========================================================================
+    const TRANSLATIONS = {
+      en: {
+        tagline: "Curated Beauty & Atelier Appointments",
+        welcomeTitle1: "Curated Luxury Beauty, Anywhere.",
+        welcomeSub1: "Discover Europe’s finest hair ateliers, aesthetic clinics, and serene spas with effortless reservation.",
+        welcomeTitle2: "Seamless Rituals Tailored to You.",
+        welcomeSub2: "Select your preferred specialist, explore transparent service menus, and reserve in seconds.",
+        welcomeTitle3: "Elevate Your Salon Maison.",
+        welcomeSub3: "An all-in-one digital concierge for salon owners to manage bookings, staff, and monthly growth.",
+        imClient: "I'm a Client",
+        imSalonOwner: "I'm a Salon Owner",
+        next: "Continue",
+        skip: "Skip",
+        signIn: "Sign In",
+        createAccount: "Create Account",
+        email: "Email Address",
+        password: "Password",
+        fullName: "Full Name",
+        demoClientBtn: "Instant Demo: Client Experience",
+        demoOwnerBtn: "Instant Demo: Salon Owner Portal",
+        demoPlatformBtn: "View Platform Revenue & Direct Payouts",
+        discoverHeading: "Discover Ateliers",
+        searchPlaceholder: "Search salons, treatments, cities...",
+        featuredSalons: "Featured Maisons",
+        trendingTreatments: "Signature Rituals",
+        seeAll: "See All",
+        bookNow: "Reserve",
+        services: "Services",
+        specialists: "Specialists",
+        about: "About",
+        selectService: "Select Services",
+        continueToTime: "Choose Date & Time",
+        selectDate: "Select Date",
+        selectSpecialist: "Choose Specialist",
+        availableTimes: "Available Times",
+        confirmBooking: "Confirm Reservation",
+        mvpNotice: "MVP Preview Mode — No live payment is charged during client reservation.",
+        myBookings: "My Bookings",
+        upcoming: "Upcoming",
+        past: "Past",
+        cancelBooking: "Cancel",
+        reschedule: "Reschedule",
+        navExplore: "Explore",
+        navSearch: "Search",
+        navBookings: "Bookings",
+        navProfile: "Profile",
+        navDashboard: "Overview",
+        navCalendar: "Calendar",
+        navServices: "Services",
+        navStaff: "Staff",
+        navSettings: "Settings",
+        todayAppts: "Today's Appointments",
+        projectedRev: "Projected Today",
+        occupancy: "Occupancy Rate",
+        subscriptionPlan: "Partner Plan",
+        freeTrialBadge: "30-Day Free Trial",
+        trialDaysLeft: "days left in free trial",
+        trialEndedTitle: "Free Trial Ended — Upgrade Required",
+        trialEndedSub: "Your 30-day complimentary trial has concluded. Activate your monthly plan to keep accepting online bookings.",
+        activatePlanBtn: "Activate Monthly Subscription",
+        addService: "+ Add Service",
+        addStaff: "+ Add Specialist",
+        saveChanges: "Save Changes",
+        languageLabel: "App Language",
+        resetDemo: "Reset Demo Data"
+      },
+      hr: {
+        tagline: "Odabrani Luksuzni Saloni i Rezervacije",
+        welcomeTitle1: "Vrhunska Ljepota, Gdje God Bili.",
+        welcomeSub1: "Otkrijte najprestižnije frizerske ateljee, estetske centre i spa oaze uz jednostavnu rezervaciju.",
+        welcomeTitle2: "Rituali Prilagođeni Vama.",
+        welcomeSub2: "Odaberite svog stručnjaka, pregledajte jasne cjenike tretmana i rezervirajte termin u par sekundi.",
+        welcomeTitle3: "Unaprijedite Svoj Salon.",
+        welcomeSub3: "Sveobuhvatna digitalna platforma za vlasnike salona — kalendar, tim, usluge i rast poslovanja.",
+        imClient: "Tražim Uslugu (Klijent)",
+        imSalonOwner: "Vlasnik Sam Salona",
+        next: "Nastavi",
+        skip: "Preskoči",
+        signIn: "Prijava",
+        createAccount: "Registracija",
+        email: "Email Adresa",
+        password: "Lozinka",
+        fullName: "Ime i Prezime",
+        demoClientBtn: "Brzi Demo: Iskustvo Klijenta",
+        demoOwnerBtn: "Brzi Demo: Portal za Salone",
+        demoPlatformBtn: "Pregled Zarade Platforme i Isplata",
+        discoverHeading: "Istražite Salone",
+        searchPlaceholder: "Pretražite salone, tretmane, gradove...",
+        featuredSalons: "Izdvojeni Saloni",
+        trendingTreatments: "Najtraženiji Tretmani",
+        seeAll: "Vidi sve",
+        bookNow: "Rezerviraj",
+        services: "Usluge",
+        specialists: "Stručnjaci",
+        about: "O salonu",
+        selectService: "Odaberite Usluge",
+        continueToTime: "Odabir Datuma i Termina",
+        selectDate: "Odaberite Datum",
+        selectSpecialist: "Odaberite Stručnjaka",
+        availableTimes: "Slobodni Termini",
+        confirmBooking: "Potvrdi Rezervaciju",
+        mvpNotice: "MVP Verzija — Plaćanje se ne naplaćuje online u ovoj verziji.",
+        myBookings: "Moje Rezervacije",
+        upcoming: "Nadolazeći",
+        past: "Prošli",
+        cancelBooking: "Otkaži",
+        reschedule: "Promijeni termin",
+        navExplore: "Istraži",
+        navSearch: "Pretraga",
+        navBookings: "Termini",
+        navProfile: "Profil",
+        navDashboard: "Pregled",
+        navCalendar: "Kalendar",
+        navServices: "Usluge",
+        navStaff: "Tim",
+        navSettings: "Postavke",
+        todayAppts: "Današnji Termini",
+        projectedRev: "Današnji Promet",
+        occupancy: "Popunjenost",
+        subscriptionPlan: "Partner Paket",
+        freeTrialBadge: "30 Dana Besplatno",
+        trialDaysLeft: "dana preostalo u probnom roku",
+        trialEndedTitle: "Probni Period Je Završen — Potrebna Aktivacija",
+        trialEndedSub: "Vaših 30 besplatnih dana je isteklo. Aktivirajte mjesečni paket za nastavak rada i primanje rezervacija.",
+        activatePlanBtn: "Aktiviraj Mjesečnu Pretplatu",
+        addService: "+ Nova Usluga",
+        addStaff: "+ Novi Stručnjak",
+        saveChanges: "Spremi Promjene",
+        languageLabel: "Jezik Aplikacije",
+        resetDemo: "Resetiraj Demo Podatke"
+      }
+    };
+
+    function t(key) {
+      const lang = appState.language || 'en';
+      return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS.en[key] || key;
+    }
+
+    // =========================================================================
+    // 2. INITIAL STATE & REALISTIC INTERNATIONAL BEAUTY SALON DEMO DATA
+    // =========================================================================
+    const INITIAL_DATA = {
+      language: 'en',
+      viewportMode: 'mobile',
+      role: 'customer',
+      currentScreen: 'welcome',
+      history: [],
+      onboardingSlide: 0,
+      authTab: 'login',
+      selectedCity: 'All Cities',
+      selectedCategory: 'All',
+      searchQuery: '',
+      filterPriceTier: 'All',
+      filterMinRating: 0,
+      filterAvailableToday: false,
+      activeSalonId: 'salon-1',
+      salonProfileTab: 'services',
+      selectedServiceIds: ['srv-1'],
+      bookingDraft: {
+        date: '2026-11-21',
+        time: '11:30',
+        specialistId: 'stf-1',
+        notes: ''
+      },
+      myBookingsTab: 'upcoming',
+      calendarSelectedDate: '2026-11-21',
+      ownerSalonId: 'salon-1',
+      draftPlanId: 'pro',
+
+      customer: {
+        name: 'Elena Kovačević',
+        email: 'elena.kovacevic@velora.eu',
+        phone: '+387 63 412 890',
+        city: 'Mostar / Zagreb',
+        savedSalonIds: ['salon-1', 'salon-2']
+      },
+
+      platformOwner: {
+        ownerName: 'Platform Founder & Owner',
+        companyName: 'VELORA Digital d.o.o.',
+        payoutMethod: 'Stripe Connect Express + Direct SEPA / BAM IBAN',
+        iban: 'BA39 3381 3022 4891 0042',
+        swift: 'UNCRBA22',
+        stripeAccountId: 'acct_1VeloraDirectPayout88',
+        stripeConnected: false,
+        currency: 'EUR',
+        plans: [
+          { id: 'solo', name: 'Solo / Mali salon', priceEur: 19, priceKm: 37, features: ['Up to 2 specialists', 'Unlimited client bookings', '30 days free trial'] },
+          { id: 'pro', name: 'Studio Pro / Tim', priceEur: 39, priceKm: 76, features: ['Up to 8 specialists', 'Featured discovery placement', '30 days free trial + CRM'] },
+          { id: 'flagship', name: 'Flagship / Više lokacija', priceEur: 79, priceKm: 154, features: ['Unlimited specialists & locations', 'Top homepage spotlight', '30 days free trial + priority onboarding'] }
+        ],
+        invoices: [
+          { id: 'INV-2026-1104', salon: 'Maison Lumière Hair & Spa', city: 'Zagreb', plan: 'Studio Pro / Tim', amountEur: 39, amountKm: 76, date: '2026-11-18', status: 'Paid to Owner' },
+          { id: 'INV-2026-1103', salon: 'Atelier Kovačević Beauty', city: 'Mostar', plan: 'Flagship / Više lokacija', amountEur: 79, amountKm: 154, date: '2026-11-15', status: 'Paid to Owner' },
+          { id: 'INV-2026-1102', salon: 'Villa Serenity Aesthetics', city: 'Vienna', plan: 'Studio Pro / Tim', amountEur: 39, amountKm: 76, date: '2026-11-12', status: 'Paid to Owner' },
+          { id: 'INV-2026-1101', salon: 'Palazzo Rosa Nail & Brow', city: 'Milan', plan: 'Solo / Mali salon', amountEur: 19, amountKm: 37, date: '2026-11-09', status: 'Paid to Owner' }
+        ]
+      },
+
+      salons: [
+        {
+          id: 'salon-1',
+          name: 'Atelier Kovačević Beauty',
+          tagline: 'Haute Coiffure & Holistic Facial Rituals',
+          city: 'Mostar',
+          country: 'Bosnia & Herzegovina',
+          address: 'Kralja Tvrtka 14, 88000 Mostar',
+          rating: 4.96,
+          reviewsCount: 184,
+          priceTier: '€€€',
+          availableToday: true,
+          categories: ['Hair', 'Aesthetics', 'Brows & Lashes'],
+          planId: 'flagship',
+          monthlyFeeEur: 79,
+          monthlyFeeKm: 154,
+          trialStartDate: '2026-11-18',
+          trialEndDate: '2026-12-18',
+          trialDaysRemaining: 28,
+          trialTotalDays: 30,
+          trialExpired: false,
+          subscriptionStatus: 'Trial (30 Days Free)',
+          nextBillingDate: '2026-12-18',
+          coverImage: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=80',
+          gallery: [
+            'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=80',
+            'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=900&q=80'
+          ],
+          bio: 'An intimate architectural sanctuary blending Parisian hair artistry with botanical Swiss facial therapies. Every ritual begins with a private consultation over organic herbal infusions.',
+          hours: [
+            { day: 'Monday', open: '09:00', close: '20:00', active: true },
+            { day: 'Tuesday', open: '09:00', close: '20:00', active: true },
+            { day: 'Wednesday', open: '09:00', close: '20:00', active: true },
+            { day: 'Thursday', open: '09:00', close: '21:00', active: true },
+            { day: 'Friday', open: '09:00', close: '21:00', active: true },
+            { day: 'Saturday', open: '09:00', close: '17:00', active: true },
+            { day: 'Sunday', open: '10:00', close: '15:00', active: false }
+          ],
+          services: [
+            { id: 'srv-1', category: 'Hair', name: 'Signature Silk Balayage & Gloss', duration: 150, price: 145, description: 'Custom hand-painted dimension with bond-building botanical gloss and blowout.', active: true },
+            { id: 'srv-2', category: 'Hair', name: 'Couture Cut & Velvet Blowout', duration: 60, price: 55, description: 'Precision tailoring, scalp massage ritual, and signature voluminous styling.', active: true },
+            { id: 'srv-3', category: 'Aesthetics', name: '24K Gold & Cellular Lift Facial', duration: 75, price: 120, description: 'Lymphatic sculpting massage paired with peptide infusion for luminous skin.', active: true },
+            { id: 'srv-4', category: 'Brows & Lashes', name: 'Cashmere Lash Lift & Brow Lamination', duration: 60, price: 65, description: 'Keratin nourishment and bespoke brow architecture.', active: true }
+          ],
+          staff: [
+            { id: 'stf-1', name: 'Ana Marić', role: 'Creative Art Director', specialty: 'Hair & Color', rating: 4.98, available: true, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80' },
+            { id: 'stf-2', name: 'Sara Delić', role: 'Master Aesthetician', specialty: 'Facial & Skin', rating: 4.95, available: true, avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80' },
+            { id: 'stf-3', name: 'Nina Horvat', role: 'Brow & Lash Architect', specialty: 'Brows & Lashes', rating: 4.92, available: true, avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=300&q=80' }
+          ]
+        },
+        {
+          id: 'salon-2',
+          name: 'Maison Lumière Hair & Spa',
+          tagline: 'Organic Botanical Spa & Parisian Styling',
+          city: 'Zagreb',
+          country: 'Croatia',
+          address: 'Gundulićeva 22, 10000 Zagreb',
+          rating: 4.92,
+          reviewsCount: 241,
+          priceTier: '€€€',
+          availableToday: true,
+          categories: ['Spa & Massage', 'Hair', 'Nails'],
+          planId: 'pro',
+          monthlyFeeEur: 39,
+          monthlyFeeKm: 76,
+          trialStartDate: '2026-11-10',
+          trialEndDate: '2026-12-10',
+          trialDaysRemaining: 20,
+          trialTotalDays: 30,
+          trialExpired: false,
+          subscriptionStatus: 'Trial (30 Days Free)',
+          nextBillingDate: '2026-12-10',
+          coverImage: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1000&q=80',
+          gallery: [
+            'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=80'
+          ],
+          bio: 'Located in the heart of Zagreb’s historic Lower Town, Maison Lumière combines warm travertine interiors with slow-beauty spa rituals and bespoke manicure artistry.',
+          hours: [
+            { day: 'Monday', open: '09:00', close: '20:00', active: true },
+            { day: 'Tuesday', open: '09:00', close: '20:00', active: true },
+            { day: 'Wednesday', open: '09:00', close: '20:00', active: true },
+            { day: 'Thursday', open: '09:00', close: '20:00', active: true },
+            { day: 'Friday', open: '09:00', close: '21:00', active: true },
+            { day: 'Saturday', open: '09:00', close: '16:00', active: true },
+            { day: 'Sunday', open: '10:00', close: '15:00', active: false }
+          ],
+          services: [
+            { id: 'srv-201', category: 'Spa & Massage', name: 'Warm Quartz & Neroli Body Ritual', duration: 90, price: 110, description: 'Full-body aromatherapy massage with warm mineral stones.', active: true },
+            { id: 'srv-202', category: 'Nails', name: 'Japanese BIAB Minimalist Manicure', duration: 60, price: 48, description: 'Cuticle care, strengthening builder gel, and sheer ivory finish.', active: true },
+            { id: 'srv-203', category: 'Hair', name: 'Kérastase Caviar Scalp & Shine Spa', duration: 50, price: 72, description: 'Deep cellular hair reconstruction with steam mist therapy.', active: true }
+          ],
+          staff: [
+            { id: 'stf-201', name: 'Petra Novak', role: 'Lead Spa Therapist', specialty: 'Spa & Massage', rating: 4.94, available: true, avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80' },
+            { id: 'stf-202', name: 'Lana Jurić', role: 'Senior Nail Artist', specialty: 'Nails', rating: 4.90, available: true, avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80' }
+          ]
+        },
+        {
+          id: 'salon-3',
+          name: 'Villa Serenity Aesthetics',
+          tagline: 'Non-Invasive Skin Rejuvenation & Wellness',
+          city: 'Vienna',
+          country: 'Austria',
+          address: 'Kohlmarkt 8, 1010 Wien',
+          rating: 4.89,
+          reviewsCount: 129,
+          priceTier: '€€€',
+          availableToday: false,
+          categories: ['Aesthetics', 'Spa & Massage'],
+          planId: 'pro',
+          monthlyFeeEur: 39,
+          monthlyFeeKm: 76,
+          trialStartDate: '2026-11-05',
+          trialEndDate: '2026-12-05',
+          trialDaysRemaining: 15,
+          trialTotalDays: 30,
+          trialExpired: false,
+          subscriptionStatus: 'Trial (30 Days Free)',
+          nextBillingDate: '2026-12-05',
+          coverImage: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=1000&q=80',
+          gallery: [
+            'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=900&q=80'
+          ],
+          bio: 'Discreet Viennese aesthetic sanctuary specializing in cellular hydro-dermabrasion, LED light therapy, and holistic facial sculpting.',
+          hours: [
+            { day: 'Monday', open: '10:00', close: '19:00', active: true },
+            { day: 'Tuesday', open: '10:00', close: '19:00', active: true },
+            { day: 'Wednesday', open: '10:00', close: '19:00', active: true },
+            { day: 'Thursday', open: '10:00', close: '20:00', active: true },
+            { day: 'Friday', open: '10:00', close: '19:00', active: true },
+            { day: 'Saturday', open: '10:00', close: '15:00', active: true },
+            { day: 'Sunday', open: '10:00', close: '15:00', active: false }
+          ],
+          services: [
+            { id: 'srv-301', category: 'Aesthetics', name: 'Hydra-Glow Glass Skin Protocol', duration: 60, price: 135, description: 'Multi-stage vortex infusion with hyaluronic acid and LED.', active: true },
+            { id: 'srv-302', category: 'Spa & Massage', name: 'Buccal & Gua Sha Contouring', duration: 60, price: 115, description: 'Deep intra-oral and lymphatic facial release.', active: true }
+          ],
+          staff: [
+            { id: 'stf-301', name: 'Clara Weber', role: 'Dermal Specialist', specialty: 'Aesthetics', rating: 4.91, available: true, avatar: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&w=300&q=80' }
+          ]
+        },
+        {
+          id: 'salon-4',
+          name: 'Palazzo Rosa Nail & Brow',
+          tagline: 'Editorial Nail Couture & Brow Bar',
+          city: 'Milan',
+          country: 'Italy',
+          address: 'Via Solferino 18, 20121 Milano',
+          rating: 4.85,
+          reviewsCount: 97,
+          priceTier: '€€',
+          availableToday: true,
+          categories: ['Nails', 'Brows & Lashes'],
+          planId: 'solo',
+          monthlyFeeEur: 19,
+          monthlyFeeKm: 37,
+          trialStartDate: '2026-11-19',
+          trialEndDate: '2026-12-19',
+          trialDaysRemaining: 29,
+          trialTotalDays: 30,
+          trialExpired: false,
+          subscriptionStatus: 'Trial (30 Days Free)',
+          nextBillingDate: '2026-12-19',
+          coverImage: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=1000&q=80',
+          gallery: [
+            'https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=900&q=80'
+          ],
+          bio: 'Brera’s favorite sunlit beauty bar crafting clean architectural manicures and feathered editorial brows.',
+          hours: [
+            { day: 'Monday', open: '09:30', close: '19:30', active: true },
+            { day: 'Tuesday', open: '09:30', close: '19:30', active: true },
+            { day: 'Wednesday', open: '09:30', close: '19:30', active: true },
+            { day: 'Thursday', open: '09:30', close: '20:30', active: true },
+            { day: 'Friday', open: '09:30', close: '20:30', active: true },
+            { day: 'Saturday', open: '10:00', close: '18:00', active: true },
+            { day: 'Sunday', open: '10:00', close: '15:00', active: false }
+          ],
+          services: [
+            { id: 'srv-401', category: 'Nails', name: 'Brera Velvet Spa Pedicure', duration: 60, price: 62, description: 'Almond milk soak, exfoliation, and non-toxic polish.', active: true },
+            { id: 'srv-402', category: 'Brows & Lashes', name: 'Milanese Brow Sculpt & Tint', duration: 40, price: 42, description: 'Precision mapping, botanical tint, and soothing balm.', active: true }
+          ],
+          staff: [
+            { id: 'stf-401', name: 'Giulia Conti', role: 'Master Nail Stylist', specialty: 'Nails', rating: 4.88, available: true, avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80' }
+          ]
+        }
+      ],
+
+      bookings: [
+        {
+          id: 'VLR-8492',
+          salonId: 'salon-1',
+          salonName: 'Atelier Kovačević Beauty',
+          clientName: 'Elena Kovačević',
+          clientPhone: '+387 63 412 890',
+          serviceNames: ['Signature Silk Balayage & Gloss'],
+          specialistId: 'stf-1',
+          specialistName: 'Ana Marić',
+          date: '2026-11-21',
+          time: '10:00',
+          duration: 150,
+          totalPrice: 145,
+          status: 'Confirmed',
+          notes: 'Prefer warm champagne undertone.'
+        },
+        {
+          id: 'VLR-8499',
+          salonId: 'salon-1',
+          salonName: 'Atelier Kovačević Beauty',
+          clientName: 'Maja Radić',
+          clientPhone: '+387 61 209 331',
+          serviceNames: ['24K Gold & Cellular Lift Facial'],
+          specialistId: 'stf-2',
+          specialistName: 'Sara Delić',
+          date: '2026-11-21',
+          time: '13:30',
+          duration: 75,
+          totalPrice: 120,
+          status: 'Confirmed',
+          notes: 'Sensitive skin, fragrance-free preferred.'
+        },
+        {
+          id: 'VLR-8504',
+          salonId: 'salon-1',
+          salonName: 'Atelier Kovačević Beauty',
+          clientName: 'Ivana Bošnjak',
+          clientPhone: '+387 63 881 102',
+          serviceNames: ['Cashmere Lash Lift & Brow Lamination'],
+          specialistId: 'stf-3',
+          specialistName: 'Nina Horvat',
+          date: '2026-11-21',
+          time: '15:30',
+          duration: 60,
+          totalPrice: 65,
+          status: 'Pending',
+          notes: ''
+        },
+        {
+          id: 'VLR-7910',
+          salonId: 'salon-2',
+          salonName: 'Maison Lumière Hair & Spa',
+          clientName: 'Elena Kovačević',
+          clientPhone: '+387 63 412 890',
+          serviceNames: ['Warm Quartz & Neroli Body Ritual'],
+          specialistId: 'stf-201',
+          specialistName: 'Petra Novak',
+          date: '2026-10-14',
+          time: '16:00',
+          duration: 90,
+          totalPrice: 110,
+          status: 'Completed',
+          notes: ''
+        }
+      ]
+    };
+
+    let appState = loadState();
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem('velora_mvp_state_v2');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn('Storage unavailable, using in-memory state');
+      }
+      return JSON.parse(JSON.stringify(INITIAL_DATA));
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('velora_mvp_state_v2', JSON.stringify(appState));
+      } catch (e) {
+        // Ignore storage quota/private mode errors
+      }
+    }
+
+    function resetDemoData() {
+      appState = JSON.parse(JSON.stringify(INITIAL_DATA));
+      appState.currentScreen = 'home';
+      appState.role = 'customer';
+      saveState();
+      render();
+      showToast('Demo data restored to defaults');
+    }
+
+    // =========================================================================
+    // 3. NAVIGATION & SHELL RENDERING
+    // =========================================================================
+    function navigateTo(screen, pushHistory = true) {
+      if (pushHistory && appState.currentScreen && appState.currentScreen !== screen) {
+        appState.history.push(appState.currentScreen);
+      }
+      appState.currentScreen = screen;
+
+      const customerScreens = ['home', 'search', 'salonProfile', 'servicesMenu', 'dateTime', 'bookingConfirm', 'myBookings', 'customerProfile'];
+      const ownerScreens = ['salonRegister', 'salonDashboard', 'servicesManage', 'staffManage', 'bookingCalendar', 'businessSettings'];
+
+      if (customerScreens.includes(screen)) appState.role = 'customer';
+      else if (ownerScreens.includes(screen)) appState.role = 'owner';
+      else if (screen === 'platformRevenue') appState.role = 'platform';
+      else if (screen === 'welcome' || screen === 'auth') appState.role = 'onboarding';
+
+      saveState();
+      render();
+      const container = document.getElementById('screen-container');
+      if (container) container.scrollTop = 0;
+    }
+
+    function goBack() {
+      if (appState.history.length > 0) {
+        const prev = appState.history.pop();
+        navigateTo(prev, false);
+      } else {
+        navigateTo(appState.role === 'owner' ? 'salonDashboard' : 'home', false);
+      }
+    }
+
+    function switchRole(role) {
+      appState.role = role;
+      if (role === 'onboarding') navigateTo('welcome');
+      else if (role === 'customer') navigateTo('home');
+      else if (role === 'owner') navigateTo('salonDashboard');
+      else if (role === 'platform') navigateTo('platformRevenue');
+    }
+
+    function setLanguage(lang) {
+      appState.language = lang;
+      saveState();
+      render();
+      showToast(lang === 'hr' ? 'Jezik promijenjen na Hrvatski' : 'Language switched to English');
+    }
+
+    function toggleViewportMode() {
+      appState.viewportMode = appState.viewportMode === 'mobile' ? 'desktop' : 'mobile';
+      saveState();
+      render();
+    }
+
+    function handleLogoClick() {
+      if (appState.role === 'owner') navigateTo('salonDashboard');
+      else if (appState.role === 'platform') navigateTo('platformRevenue');
+      else navigateTo('home');
+    }
+
+    function showToast(msg) {
+      const banner = document.getElementById('toast-banner');
+      const text = document.getElementById('toast-message');
+      text.textContent = msg;
+      banner.classList.remove('opacity-0', 'translate-y-3');
+      banner.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        banner.classList.remove('opacity-100', 'translate-y-0');
+        banner.classList.add('opacity-0', 'translate-y-3');
+      }, 2800);
+    }
+
+    function openModal(htmlContent) {
+      const overlay = document.getElementById('modal-overlay');
+      const box = document.getElementById('modal-box');
+      box.innerHTML = htmlContent;
+      overlay.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.add('hidden');
+    }
+
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    function getActiveSalon() {
+      return appState.salons.find(s => s.id === appState.activeSalonId) || appState.salons[0];
+    }
+
+    function getOwnerSalon() {
+      return appState.salons.find(s => s.id === appState.ownerSalonId) || appState.salons[0];
+    }
+
+    function imgFallback(el) {
+      el.onerror = null;
+      el.src = 'https://placehold.co/800x500/E6DDD0/2C221E?text=VELORA+ATELIER';
+    }
+
+    // =========================================================================
+    // 4. SCREENS 1–10: ONBOARDING, AUTH & CUSTOMER EXPERIENCE
+    // =========================================================================
+    function renderWelcomeScreen() {
+      const slides = [
+        {
+          title: t('welcomeTitle1'),
+          subtitle: t('welcomeSub1'),
+          img: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=80'
+        },
+        {
+          title: t('welcomeTitle2'),
+          subtitle: t('welcomeSub2'),
+          img: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=80'
+        },
+        {
+          title: t('welcomeTitle3'),
+          subtitle: t('welcomeSub3'),
+          img: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=900&q=80'
+        }
+      ];
+      const idx = appState.onboardingSlide % slides.length;
+      const slide = slides[idx];
+
+      return `
+        <div class="p-5 flex flex-col justify-between min-h-[730px] space-y-6">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] uppercase tracking-[0.22em] text-taupe font-semibold">${t('tagline')}</span>
+            <button onclick="navigateTo('home')" class="text-xs font-semibold text-espresso/75 hover:text-espresso underline">${t('skip')}</button>
+          </div>
+
+          <div class="relative rounded-[28px] overflow-hidden shadow-luxury border border-sand h-72">
+            <img src="${slide.img}" alt="VELORA luxury salon" onerror="imgFallback(this)" class="w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-t from-espresso/75 via-espresso/20 to-transparent flex flex-col justify-end p-5 text-ivory">
+              <span class="inline-block w-fit px-2.5 py-0.5 rounded-full bg-champagne/90 text-espresso text-[10px] font-bold uppercase tracking-wider mb-2">
+                0${idx + 1} / 03
+              </span>
+              <h1 class="font-serif-editorial text-3xl font-semibold leading-tight">${slide.title}</h1>
+            </div>
+          </div>
+
+          <p class="text-sm text-taupe leading-relaxed">${slide.subtitle}</p>
+
+          <div class="flex items-center justify-center gap-2">
+            ${slides.map((_, i) => `
+              <button onclick="appState.onboardingSlide=${i}; render();" aria-label="Slide ${i + 1}" class="h-2 rounded-full transition-all ${i === idx ? 'w-7 bg-espresso' : 'w-2 bg-sand'}"></button>
+            `).join('')}
+          </div>
+
+          <div class="space-y-2.5 pt-1">
+            <button onclick="navigateTo('home')" class="w-full py-3.5 rounded-2xl bg-espresso text-ivory text-sm font-semibold shadow-luxury hover:bg-espresso/95 transition">
+              ${t('imClient')} →
+            </button>
+            <button onclick="navigateTo('salonRegister')" class="w-full py-3.5 rounded-2xl bg-beige border border-sand text-espresso text-sm font-semibold hover:bg-sand/60 transition">
+              ${t('imSalonOwner')} • ${t('freeTrialBadge')}
+            </button>
+            <button onclick="navigateTo('auth')" class="w-full py-2.5 text-xs font-semibold text-taupe hover:text-espresso transition">
+              ${t('signIn')} / ${t('createAccount')}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAuthScreen() {
+      const isLogin = appState.authTab === 'login';
+      return `
+        <div class="p-5 space-y-5">
+          <div>
+            <span class="text-[10px] uppercase tracking-[0.2em] text-champagneDark font-bold">Member Access</span>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso mt-0.5">${isLogin ? t('signIn') : t('createAccount')}</h1>
+            <p class="text-xs text-taupe mt-1">Access your VELORA reservations or manage your beauty atelier.</p>
+          </div>
+
+          <div class="grid grid-cols-2 bg-beige p-1 rounded-2xl border border-sand">
+            <button onclick="appState.authTab='login'; render();" class="py-2 rounded-xl text-xs font-semibold transition ${isLogin ? 'bg-espresso text-ivory shadow-sm' : 'text-espresso'}">${t('signIn')}</button>
+            <button onclick="appState.authTab='signup'; render();" class="py-2 rounded-xl text-xs font-semibold transition ${!isLogin ? 'bg-espresso text-ivory shadow-sm' : 'text-espresso'}">${t('createAccount')}</button>
+          </div>
+
+          <form onsubmit="event.preventDefault(); handleAuthSubmit(this);" class="space-y-3.5">
+            ${!isLogin ? `
+              <div>
+                <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">${t('fullName')}</label>
+                <input name="name" type="text" value="${appState.customer.name}" required class="w-full px-4 py-3 rounded-2xl bg-white border border-sand text-sm text-espresso" />
+              </div>
+            ` : ''}
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">${t('email')}</label>
+              <input name="email" type="email" value="${appState.customer.email}" required class="w-full px-4 py-3 rounded-2xl bg-white border border-sand text-sm text-espresso" />
+            </div>
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">${t('password')}</label>
+              <input name="password" type="password" value="••••••••••••" required class="w-full px-4 py-3 rounded-2xl bg-white border border-sand text-sm text-espresso" />
+            </div>
+            <button type="submit" class="w-full py-3.5 rounded-2xl bg-espresso text-ivory text-sm font-semibold shadow-luxury hover:bg-espresso/95 transition">
+              ${isLogin ? t('signIn') : t('createAccount')}
+            </button>
+          </form>
+
+          <div class="pt-3 border-t border-sand space-y-2">
+            <div class="text-[10px] uppercase tracking-wider font-semibold text-taupe text-center mb-1">One-Click Role Previews</div>
+            <button onclick="navigateTo('home')" class="w-full py-2.5 px-4 rounded-2xl bg-beige border border-sand text-xs font-semibold text-espresso hover:bg-sand/60 transition">${t('demoClientBtn')}</button>
+            <button onclick="navigateTo('salonDashboard')" class="w-full py-2.5 px-4 rounded-2xl bg-beige border border-sand text-xs font-semibold text-espresso hover:bg-sand/60 transition">${t('demoOwnerBtn')}</button>
+            <button onclick="navigateTo('platformRevenue')" class="w-full py-2.5 px-4 rounded-2xl bg-espresso/95 text-champagne text-xs font-semibold hover:bg-espresso transition">${t('demoPlatformBtn')}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function handleAuthSubmit(form) {
+      const fd = new FormData(form);
+      if (fd.get('name')) appState.customer.name = fd.get('name');
+      if (fd.get('email')) appState.customer.email = fd.get('email');
+      saveState();
+      navigateTo('home');
+      showToast(`Welcome back, ${appState.customer.name.split(' ')[0]}`);
+    }
+
+    function renderCustomerHomeScreen() {
+      const cities = ['All Cities', ...new Set(appState.salons.map(s => s.city))];
+      const categories = ['All', 'Hair', 'Aesthetics', 'Nails', 'Spa & Massage', 'Brows & Lashes'];
+
+      const filtered = appState.salons.filter(s => {
+        const matchCity = appState.selectedCity === 'All Cities' || s.city === appState.selectedCity;
+        const matchCat = appState.selectedCategory === 'All' || s.categories.includes(appState.selectedCategory);
+        return matchCity && matchCat;
+      });
+
+      const signatureServices = [];
+      appState.salons.forEach(s => {
+        s.services.filter(srv => srv.active).forEach(srv => {
+          signatureServices.push({ ...srv, salonId: s.id, salonName: s.name, city: s.city });
+        });
+      });
+
+      return `
+        <div class="p-5 space-y-6">
+          <!-- City Selector & Editorial Headline -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] uppercase tracking-[0.2em] text-champagneDark font-semibold">${t('discoverHeading')}</span>
+              <select onchange="appState.selectedCity=this.value; render();" aria-label="Select city" class="bg-beige border border-sand rounded-full px-3 py-1 text-xs font-semibold text-espresso">
+                ${cities.map(c => `<option value="${c}" ${appState.selectedCity === c ? 'selected' : ''}>${c}</option>`).join('')}
+              </select>
+            </div>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso leading-tight">
+              Reserve refined beauty rituals across Europe & beyond.
+            </h1>
+
+            <!-- Search Bar Trigger -->
+            <div onclick="navigateTo('search')" class="flex items-center gap-2.5 bg-white border border-sand rounded-2xl px-4 py-3 shadow-card cursor-pointer hover:border-champagne transition">
+              <svg class="w-4 h-4 text-taupe" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <span class="text-xs text-taupe flex-1">${t('searchPlaceholder')}</span>
+              <span class="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-beige text-espresso">Filters</span>
+            </div>
+          </div>
+
+          <!-- Horizontal Category Chips -->
+          <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+            ${categories.map(cat => {
+              const active = appState.selectedCategory === cat;
+              return `<button onclick="appState.selectedCategory='${cat}'; render();" class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${active ? 'bg-espresso text-ivory shadow-sm' : 'bg-beige text-espresso border border-sand hover:bg-sand/60'}">${cat}</button>`;
+            }).join('')}
+          </div>
+
+          <!-- Featured Salons -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h2 class="font-serif-editorial text-2xl font-semibold text-espresso">${t('featuredSalons')}</h2>
+              <button onclick="navigateTo('search')" class="text-xs font-semibold text-champagneDark">${t('seeAll')} →</button>
+            </div>
+
+            <div class="space-y-4">
+              ${filtered.length === 0 ? `
+                <div class="bg-white rounded-2xl border border-sand p-6 text-center space-y-2">
+                  <p class="text-xs text-taupe">No salons match that city and category combination.</p>
+                  <button onclick="appState.selectedCity='All Cities'; appState.selectedCategory='All'; render();" class="px-4 py-2 rounded-full bg-espresso text-ivory text-xs font-semibold">Reset Filters</button>
+                </div>
+              ` : filtered.map(salon => renderSalonCard(salon)).join('')}
+            </div>
+          </div>
+
+          <!-- Signature Treatments Horizontal Strip -->
+          <div class="space-y-3">
+            <h2 class="font-serif-editorial text-2xl font-semibold text-espresso">${t('trendingTreatments')}</h2>
+            <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+              ${signatureServices.slice(0, 6).map(item => `
+                <div onclick="openSalonWithService('${item.salonId}', '${item.id}')" class="min-w-[210px] bg-white rounded-2xl border border-sand p-3.5 shadow-card cursor-pointer hover:border-champagne transition flex flex-col justify-between">
+                  <div>
+                    <span class="text-[10px] uppercase tracking-wider text-champagneDark font-semibold">${item.category} • ${item.city}</span>
+                    <div class="font-serif-editorial text-lg font-semibold text-espresso leading-snug mt-1">${item.name}</div>
+                    <div class="text-[11px] text-taupe mt-0.5">${item.salonName}</div>
+                  </div>
+                  <div class="flex items-center justify-between pt-3 mt-3 border-t border-sand/60">
+                    <span class="text-xs font-bold text-espresso">€${item.price}</span>
+                    <span class="text-[10px] text-taupe">${item.duration} min</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSalonCard(salon) {
+      const isSaved = appState.customer.savedSalonIds.includes(salon.id);
+      return `
+        <div class="bg-white rounded-[24px] border border-sand overflow-hidden shadow-card hover:shadow-luxury transition">
+          <div class="relative h-44 cursor-pointer" onclick="openSalonProfile('${salon.id}')">
+            <img src="${salon.coverImage}" alt="${salon.name}" onerror="imgFallback(this)" class="w-full h-full object-cover" />
+            <div class="absolute top-3 left-3 flex gap-1.5">
+              <span class="px-2.5 py-1 rounded-full bg-ivory/95 text-espresso text-[10px] font-bold shadow-sm">${salon.city}</span>
+              ${salon.availableToday ? `<span class="px-2.5 py-1 rounded-full bg-espresso/90 text-champagne text-[10px] font-semibold">Available Today</span>` : ''}
+            </div>
+            <button onclick="event.stopPropagation(); toggleSaveSalon('${salon.id}');" aria-label="Save salon" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-ivory/95 text-espresso flex items-center justify-center shadow-sm">
+              ${isSaved ? '♥' : '♡'}
+            </button>
+          </div>
+          <div class="p-4 space-y-2.5">
+            <div class="flex items-start justify-between gap-2">
+              <div onclick="openSalonProfile('${salon.id}')" class="cursor-pointer">
+                <h3 class="font-serif-editorial text-xl font-semibold text-espresso leading-tight">${salon.name}</h3>
+                <p class="text-xs text-taupe">${salon.tagline}</p>
+              </div>
+              <div class="text-right shrink-0">
+                <div class="text-xs font-bold text-espresso">★ ${salon.rating}</div>
+                <div class="text-[10px] text-taupe">(${salon.reviewsCount})</div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-sand/60">
+              <span class="text-xs font-semibold text-taupe">${salon.categories.slice(0, 2).join(' • ')} • ${salon.priceTier}</span>
+              <button onclick="openSalonProfile('${salon.id}')" class="px-3.5 py-1.5 rounded-full bg-espresso text-ivory text-xs font-semibold hover:bg-espresso/90 transition">
+                ${t('bookNow')}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleSaveSalon(salonId) {
+      const idx = appState.customer.savedSalonIds.indexOf(salonId);
+      if (idx >= 0) {
+        appState.customer.savedSalonIds.splice(idx, 1);
+        showToast('Removed from saved ateliers');
+      } else {
+        appState.customer.savedSalonIds.push(salonId);
+        showToast('Saved to your favorite ateliers');
+      }
+      saveState();
+      render();
+    }
+
+    function renderSearchScreen() {
+      const q = (appState.searchQuery || '').toLowerCase().trim();
+      const results = appState.salons.filter(s => {
+        const matchesQuery = !q ||
+          s.name.toLowerCase().includes(q) ||
+          s.city.toLowerCase().includes(q) ||
+          s.categories.some(c => c.toLowerCase().includes(q)) ||
+          s.services.some(srv => srv.name.toLowerCase().includes(q));
+        const matchesPrice = appState.filterPriceTier === 'All' || s.priceTier === appState.filterPriceTier;
+        const matchesRating = s.rating >= Number(appState.filterMinRating || 0);
+        const matchesToday = !appState.filterAvailableToday || s.availableToday;
+        return matchesQuery && matchesPrice && matchesRating && matchesToday;
+      });
+
+      return `
+        <div class="p-5 space-y-4">
+          <div>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">Search & Filters</h1>
+            <p class="text-xs text-taupe">Find salons by city, treatment, rating, or price tier</p>
+          </div>
+
+          <input type="text" value="${appState.searchQuery}" oninput="appState.searchQuery=this.value; render();" placeholder="${t('searchPlaceholder')}" class="w-full px-4 py-3 rounded-2xl bg-white border border-sand text-sm text-espresso" />
+
+          <div class="flex flex-wrap gap-2">
+            ${['All', '€€', '€€€'].map(tier => `
+              <button onclick="appState.filterPriceTier='${tier}'; render();" class="px-3 py-1.5 rounded-full text-xs font-semibold ${appState.filterPriceTier === tier ? 'bg-espresso text-ivory' : 'bg-beige text-espresso border border-sand'}">${tier === 'All' ? 'All Prices' : tier}</button>
+            `).join('')}
+
+            <button onclick="appState.filterMinRating = appState.filterMinRating === 4.9 ? 0 : 4.9; render();" class="px-3 py-1.5 rounded-full text-xs font-semibold ${appState.filterMinRating === 4.9 ? 'bg-espresso text-ivory' : 'bg-beige text-espresso border border-sand'}">★ 4.9+</button>
+
+            <button onclick="appState.filterAvailableToday = !appState.filterAvailableToday; render();" class="px-3 py-1.5 rounded-full text-xs font-semibold ${appState.filterAvailableToday ? 'bg-espresso text-ivory' : 'bg-beige text-espresso border border-sand'}">Available Today</button>
+          </div>
+
+          <div class="text-xs text-taupe font-medium">${results.length} ${results.length === 1 ? 'salon' : 'salons'} found</div>
+
+          <div class="space-y-4">
+            ${results.length === 0 ? `
+              <div class="bg-white rounded-2xl border border-sand p-6 text-center space-y-2">
+                <p class="text-xs text-taupe">No matching salons found. Try clearing your filters.</p>
+                <button onclick="appState.searchQuery=''; appState.filterPriceTier='All'; appState.filterMinRating=0; appState.filterAvailableToday=false; render();" class="px-4 py-2 rounded-full bg-espresso text-ivory text-xs font-semibold">Clear All</button>
+              </div>
+            ` : results.map(s => renderSalonCard(s)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function openSalonProfile(salonId) {
+      appState.activeSalonId = salonId;
+      appState.salonProfileTab = 'services';
+      const salon = getActiveSalon();
+      if (salon.services.length > 0) {
+        appState.selectedServiceIds = [salon.services[0].id];
+      }
+      navigateTo('salonProfile');
+    }
+
+    function openSalonWithService(salonId, serviceId) {
+      appState.activeSalonId = salonId;
+      appState.selectedServiceIds = [serviceId];
+      appState.salonProfileTab = 'services';
+      navigateTo('salonProfile');
+    }
+
+    function renderSalonProfileScreen() {
+      const salon = getActiveSalon();
+      const tab = appState.salonProfileTab || 'services';
+
+      return `
+        <div class="pb-6">
+          <div class="relative h-56">
+            <img src="${salon.coverImage}" alt="${salon.name}" onerror="imgFallback(this)" class="w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-t from-espresso/80 via-espresso/20 to-transparent flex flex-col justify-end p-5 text-ivory">
+              <span class="text-[10px] uppercase tracking-widest text-champagne font-semibold">${salon.city}, ${salon.country}</span>
+              <h1 class="font-serif-editorial text-3xl font-semibold leading-tight">${salon.name}</h1>
+              <p class="text-xs text-ivory/80">${salon.address} • ★ ${salon.rating} (${salon.reviewsCount})</p>
+            </div>
+          </div>
+
+          <div class="p-5 space-y-4">
+            <div class="grid grid-cols-3 bg-beige p-1 rounded-2xl border border-sand text-xs font-semibold">
+              <button onclick="appState.salonProfileTab='services'; render();" class="py-2 rounded-xl transition ${tab === 'services' ? 'bg-espresso text-ivory' : 'text-espresso'}">${t('services')}</button>
+              <button onclick="appState.salonProfileTab='staff'; render();" class="py-2 rounded-xl transition ${tab === 'staff' ? 'bg-espresso text-ivory' : 'text-espresso'}">${t('specialists')}</button>
+              <button onclick="appState.salonProfileTab='about'; render();" class="py-2 rounded-xl transition ${tab === 'about' ? 'bg-espresso text-ivory' : 'text-espresso'}">${t('about')}</button>
+            </div>
+
+            ${tab === 'services' ? `
+              <div class="space-y-2.5">
+                ${salon.services.filter(srv => srv.active).map(srv => {
+                  const checked = appState.selectedServiceIds.includes(srv.id);
+                  return `
+                    <div onclick="toggleServiceSelection('${srv.id}')" class="p-3.5 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-3 ${checked ? 'bg-white border-champagne shadow-card' : 'bg-white/70 border-sand'}">
+                      <div>
+                        <div class="text-xs font-bold text-espresso">${srv.name}</div>
+                        <div class="text-[11px] text-taupe mt-0.5">${srv.description}</div>
+                        <div class="text-[10px] text-champagneDark font-semibold mt-1">${srv.duration} min • €${srv.price}</div>
+                      </div>
+                      <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${checked ? 'bg-espresso text-ivory' : 'bg-beige text-taupe'}">${checked ? '✓' : '+'}</span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+              <button onclick="navigateTo('servicesMenu')" class="w-full py-3.5 rounded-2xl bg-espresso text-ivory text-sm font-semibold shadow-luxury">
+                ${t('continueToTime')} (${appState.selectedServiceIds.length}) →
+              </button>
+            ` : ''}
+
+            ${tab === 'staff' ? `
+              <div class="space-y-2.5">
+                ${salon.staff.map(stf => `
+                  <div class="bg-white rounded-2xl border border-sand p-3.5 flex items-center justify-between shadow-card">
+                    <div class="flex items-center gap-3">
+                      <img src="${stf.avatar}" alt="${stf.name}" onerror="imgFallback(this)" class="w-12 h-12 rounded-full object-cover border border-sand" />
+                      <div>
+                        <div class="text-xs font-bold text-espresso">${stf.name}</div>
+                        <div class="text-[11px] text-taupe">${stf.role} • ${stf.specialty}</div>
+                        <div class="text-[10px] text-champagneDark font-semibold">★ ${stf.rating}</div>
+                      </div>
+                    </div>
+                    <button onclick="appState.bookingDraft.specialistId='${stf.id}'; navigateTo('servicesMenu');" class="px-3 py-1.5 rounded-full bg-beige text-espresso text-xs font-semibold hover:bg-sand">Select</button>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            ${tab === 'about' ? `
+              <div class="bg-white rounded-2xl border border-sand p-4 space-y-3 shadow-card">
+                <p class="text-xs text-espresso/85 leading-relaxed">${salon.bio}</p>
+                <div class="pt-2 border-t border-sand/60 space-y-1.5">
+                  <div class="text-[10px] uppercase tracking-wider font-bold text-taupe">Opening Hours</div>
+                  ${salon.hours.map(h => `
+                    <div class="flex justify-between text-xs">
+                      <span class="text-espresso font-medium">${h.day}</span>
+                      <span class="text-taupe">${h.active ? `${h.open} – ${h.close}` : 'Closed'}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleServiceSelection(serviceId) {
+      const idx = appState.selectedServiceIds.indexOf(serviceId);
+      if (idx >= 0) appState.selectedServiceIds.splice(idx, 1);
+      else appState.selectedServiceIds.push(serviceId);
+      saveState();
+      render();
+    }
+
+    function renderServicesMenuScreen() {
+      const salon = getActiveSalon();
+      const selectedServices = salon.services.filter(s => appState.selectedServiceIds.includes(s.id));
+      const totalEur = selectedServices.reduce((sum, s) => sum + Number(s.price), 0);
+      const totalMin = selectedServices.reduce((sum, s) => sum + Number(s.duration), 0);
+
+      return `
+        <div class="p-5 space-y-5">
+          <div>
+            <span class="text-[10px] uppercase tracking-widest text-champagneDark font-semibold">${salon.name}</span>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">${t('selectService')}</h1>
+          </div>
+
+          <div class="space-y-2.5">
+            ${salon.services.filter(srv => srv.active).map(srv => {
+              const selected = appState.selectedServiceIds.includes(srv.id);
+              return `
+                <div onclick="toggleServiceSelection('${srv.id}')" class="p-4 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-3 ${selected ? 'bg-espresso text-ivory border-espresso shadow-card' : 'bg-white text-espresso border-sand'}">
+                  <div>
+                    <div class="text-xs font-bold">${srv.name}</div>
+                    <div class="text-[11px] ${selected ? 'text-ivory/75' : 'text-taupe'} mt-0.5">${srv.duration} min • ${srv.category}</div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <div class="font-serif-editorial text-xl font-bold ${selected ? 'text-champagne' : 'text-espresso'}">€${srv.price}</div>
+                    <div class="text-[10px] ${selected ? 'text-ivory/80' : 'text-taupe'}">${selected ? 'Selected' : 'Tap to add'}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="bg-beige rounded-2xl border border-sand p-4 flex items-center justify-between">
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-taupe font-semibold">Summary (${selectedServices.length} services)</div>
+              <div class="text-xs text-espresso font-medium">${totalMin} minutes total</div>
+            </div>
+            <div class="font-serif-editorial text-2xl font-bold text-espresso">€${totalEur}</div>
+          </div>
+
+          <button onclick="proceedFromServices()" class="w-full py-3.5 rounded-2xl bg-espresso text-ivory text-sm font-semibold shadow-luxury">
+            ${t('continueToTime')} →
+          </button>
+        </div>
+      `;
+    }
+
+    function proceedFromServices() {
+      if (appState.selectedServiceIds.length === 0) {
+        showToast('Please select at least one treatment');
+        return;
+      }
+      const salon = getActiveSalon();
+      if (!salon.staff.some(st => st.id === appState.bookingDraft.specialistId) && salon.staff[0]) {
+        appState.bookingDraft.specialistId = salon.staff[0].id;
+      }
+      navigateTo('dateTime');
+    }
+
+    function renderDateTimeScreen() {
+      const salon = getActiveSalon();
+      const dates = [
+        { value: '2026-11-21', label: 'Sat', dayNum: '21' },
+        { value: '2026-11-22', label: 'Sun', dayNum: '22' },
+        { value: '2026-11-23', label: 'Mon', dayNum: '23' },
+        { value: '2026-11-24', label: 'Tue', dayNum: '24' },
+        { value: '2026-11-25', label: 'Wed', dayNum: '25' }
+      ];
+      const times = ['09:30', '10:30', '11:30', '13:00', '14:30', '16:00', '17:30'];
+
+      return `
+        <div class="p-5 space-y-5">
+          <div>
+            <span class="text-[10px] uppercase tracking-widest text-champagneDark font-semibold">${salon.name}</span>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">${t('continueToTime')}</h1>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe">${t('selectDate')}</label>
+            <div class="grid grid-cols-5 gap-2">
+              ${dates.map(d => {
+                const active = appState.bookingDraft.date === d.value;
+                return `
+                  <button onclick="appState.bookingDraft.date='${d.value}'; render();" class="py-2.5 rounded-2xl border text-center transition ${active ? 'bg-espresso text-ivory border-espresso' : 'bg-white text-espresso border-sand'}">
+                    <div class="text-[10px] opacity-75">${d.label}</div>
+                    <div class="text-sm font-bold">${d.dayNum}</div>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe">${t('selectSpecialist')}</label>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              ${salon.staff.map(stf => {
+                const active = appState.bookingDraft.specialistId === stf.id;
+                return `
+                  <button onclick="appState.bookingDraft.specialistId='${stf.id}'; render();" class="px-3.5 py-2.5 rounded-2xl border text-left whitespace-nowrap transition ${active ? 'bg-espresso text-ivory border-espresso' : 'bg-white text-espresso border-sand'}">
+                    <div class="text-xs font-bold">${stf.name}</div>
+                    <div class="text-[10px] ${active ? 'text-champagne' : 'text-taupe'}">${stf.role}</div>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe">${t('availableTimes')}</label>
+            <div class="grid grid-cols-3 gap-2">
+              ${times.map(tm => {
+                const active = appState.bookingDraft.time === tm;
+                return `
+                  <button onclick="appState.bookingDraft.time='${tm}'; render();" class="py-2.5 rounded-xl border text-xs font-bold transition ${active ? 'bg-champagne text-espresso border-champagne' : 'bg-white text-espresso border-sand'}">${tm}</button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <button onclick="navigateTo('bookingConfirm')" class="w-full py-3.5 rounded-2xl bg-espresso text-ivory text-sm font-semibold shadow-luxury">
+            Review Reservation →
+          </button>
+        </div>
+      `;
+    }
+
+    function renderBookingConfirmScreen() {
+      const salon = getActiveSalon();
+      const services = salon.services.filter(s => appState.selectedServiceIds.includes(s.id));
+      const specialist = salon.staff.find(st => st.id === appState.bookingDraft.specialistId) || salon.staff[0];
+      const totalPrice = services.reduce((sum, s) => sum + Number(s.price), 0);
+      const totalDuration = services.reduce((sum, s) => sum + Number(s.duration), 0);
+
+      return `
+        <div class="p-5 space-y-5">
+          <div>
+            <span class="text-[10px] uppercase tracking-widest text-champagneDark font-semibold">Final Review</span>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">${t('confirmBooking')}</h1>
+          </div>
+
+          <div class="bg-white rounded-[24px] border border-sand p-4 space-y-3 shadow-card">
+            <div class="flex justify-between items-start border-b border-sand/60 pb-3">
+              <div>
+                <div class="font-serif-editorial text-xl font-semibold text-espresso">${salon.name}</div>
+                <div class="text-xs text-taupe">${salon.address}, ${salon.city}</div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-beige text-[10px] font-bold text-espresso">${appState.bookingDraft.date}</span>
+            </div>
+
+            <div class="text-xs space-y-1.5">
+              <div class="flex justify-between"><span class="text-taupe">Time</span><span class="font-bold text-espresso">${appState.bookingDraft.time} (${totalDuration} min)</span></div>
+              <div class="flex justify-between"><span class="text-taupe">Specialist</span><span class="font-bold text-espresso">${specialist ? specialist.name : 'Any Specialist'}</span></div>
+              <div class="flex justify-between"><span class="text-taupe">Guest</span><span class="font-bold text-espresso">${appState.customer.name}</span></div>
+            </div>
+
+            <div class="pt-2 border-t border-sand/60 space-y-1">
+              ${services.map(s => `
+                <div class="flex justify-between text-xs">
+                  <span class="text-espresso">${s.name}</span>
+                  <span class="font-semibold text-espresso">€${s.price}</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="pt-3 border-t border-sand flex justify-between items-baseline">
+              <span class="text-xs font-bold uppercase tracking-wider text-taupe">Total</span>
+              <span class="font-serif-editorial text-3xl font-bold text-espresso">€${totalPrice}</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">Special Requests (Optional)</label>
+            <textarea rows="2" oninput="appState.bookingDraft.notes=this.value;" placeholder="e.g. Allergy notes, styling preferences..." class="w-full px-4 py-2.5 rounded-2xl bg-white border border-sand text-xs text-espresso">${appState.bookingDraft.notes || ''}</textarea>
+          </div>
+
+          <div class="bg-beige/90 border border-sand rounded-2xl p-3 text-[11px] text-taupe">
+            ${t('mvpNotice')}
+          </div>
+
+          <button onclick="submitNewBooking()" class="w-full py-4 rounded-2xl bg-espresso text-ivory text-sm font-semibold shadow-luxury hover:bg-espresso/95 transition">
+            ${t('confirmBooking')} • €${totalPrice}
+          </button>
+        </div>
+      `;
+    }
+
+    function submitNewBooking() {
+      const salon = getActiveSalon();
+      const services = salon.services.filter(s => appState.selectedServiceIds.includes(s.id));
+      const specialist = salon.staff.find(st => st.id === appState.bookingDraft.specialistId) || salon.staff[0];
+      const totalPrice = services.reduce((sum, s) => sum + Number(s.price), 0);
+      const totalDuration = services.reduce((sum, s) => sum + Number(s.duration), 0);
+      const code = 'VLR-' + Math.floor(8600 + Math.random() * 1399);
+
+      const newBooking = {
+        id: code,
+        salonId: salon.id,
+        salonName: salon.name,
+        clientName: appState.customer.name,
+        clientPhone: appState.customer.phone,
+        serviceNames: services.length ? services.map(s => s.name) : ['Signature Atelier Session'],
+        specialistId: specialist ? specialist.id : 'stf-1',
+        specialistName: specialist ? specialist.name : 'Lead Specialist',
+        date: appState.bookingDraft.date,
+        time: appState.bookingDraft.time,
+        duration: totalDuration || 60,
+        totalPrice: totalPrice || 65,
+        status: 'Confirmed',
+        notes: appState.bookingDraft.notes || ''
+      };
+
+      appState.bookings.unshift(newBooking);
+      appState.bookingDraft.notes = '';
+      saveState();
+      navigateTo('myBookings');
+      showToast(`Reservation ${code} confirmed at ${salon.name}`);
+    }
+
+    function renderMyBookingsScreen() {
+      const tab = appState.myBookingsTab || 'upcoming';
+      const mine = appState.bookings.filter(b => b.clientName === appState.customer.name);
+      const list = tab === 'upcoming'
+        ? mine.filter(b => b.status === 'Confirmed' || b.status === 'Pending')
+        : mine.filter(b => b.status === 'Completed' || b.status === 'Cancelled');
+
+      return `
+        <div class="p-5 space-y-4">
+          <div>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">${t('myBookings')}</h1>
+            <p class="text-xs text-taupe">Manage your upcoming and past beauty appointments</p>
+          </div>
+
+          <div class="grid grid-cols-2 bg-beige p-1 rounded-2xl border border-sand">
+            <button onclick="appState.myBookingsTab='upcoming'; render();" class="py-2 rounded-xl text-xs font-semibold ${tab === 'upcoming' ? 'bg-espresso text-ivory' : 'text-espresso'}">${t('upcoming')}</button>
+            <button onclick="appState.myBookingsTab='past'; render();" class="py-2 rounded-xl text-xs font-semibold ${tab === 'past' ? 'bg-espresso text-ivory' : 'text-espresso'}">${t('past')}</button>
+          </div>
+
+          <div class="space-y-3">
+            ${list.length === 0 ? `
+              <div class="bg-white rounded-2xl border border-sand p-6 text-center space-y-3">
+                <p class="text-xs text-taupe">No appointments in this tab yet.</p>
+                <button onclick="navigateTo('home')" class="px-4 py-2 rounded-full bg-espresso text-ivory text-xs font-semibold">Explore Salons</button>
+              </div>
+            ` : list.map(b => `
+              <div class="bg-white rounded-2xl border border-sand p-4 space-y-2.5 shadow-card">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-[10px] font-mono text-taupe">${b.id}</span>
+                    <h3 class="font-serif-editorial text-xl font-semibold text-espresso leading-tight">${b.salonName}</h3>
+                    <div class="text-xs text-espresso font-medium">${b.serviceNames.join(', ')}</div>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${b.status === 'Confirmed' ? 'bg-emerald-900/10 text-emerald-900' : b.status === 'Cancelled' ? 'bg-rose-900/10 text-rose-900' : 'bg-beige text-espresso'}">${b.status}</span>
+                </div>
+
+                <div class="text-xs text-taupe flex items-center justify-between pt-2 border-t border-sand/60">
+                  <span>${b.date} • <strong>${b.time}</strong> (${b.specialistName})</span>
+                  <span class="font-bold text-espresso">€${b.totalPrice}</span>
+                </div>
+
+                ${b.status === 'Confirmed' || b.status === 'Pending' ? `
+                  <div class="flex gap-2 pt-1">
+                    <button onclick="openRescheduleModal('${b.id}')" class="flex-1 py-2 rounded-xl bg-beige text-espresso text-xs font-semibold hover:bg-sand transition">${t('reschedule')}</button>
+                    <button onclick="cancelCustomerBooking('${b.id}')" class="py-2 px-3.5 rounded-xl bg-rose-50 text-rose-900 text-xs font-semibold hover:bg-rose-100 transition">${t('cancelBooking')}</button>
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function openRescheduleModal(bookingId) {
+      const b = appState.bookings.find(item => item.id === bookingId);
+      if (!b) return;
+      openModal(`
+        <div class="space-y-4">
+          <h3 class="font-serif-editorial text-2xl font-semibold text-espresso">Reschedule ${b.id}</h3>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">New Date</label>
+              <input id="resched-date" type="date" value="${b.date}" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-sand text-xs" />
+            </div>
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">New Time</label>
+              <input id="resched-time" type="time" value="${b.time}" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-sand text-xs" />
+            </div>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-beige text-espresso text-xs font-semibold">Close</button>
+            <button onclick="applyReschedule('${b.id}')" class="flex-1 py-2.5 rounded-xl bg-espresso text-ivory text-xs font-semibold">Save Time</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function applyReschedule(bookingId) {
+      const b = appState.bookings.find(item => item.id === bookingId);
+      const d = document.getElementById('resched-date').value;
+      const tm = document.getElementById('resched-time').value;
+      if (b && d && tm) {
+        b.date = d;
+        b.time = tm;
+        saveState();
+        closeModal();
+        render();
+        showToast(`Updated ${b.id} to ${d} at ${tm}`);
+      }
+    }
+
+    function cancelCustomerBooking(bookingId) {
+      const b = appState.bookings.find(item => item.id === bookingId);
+      if (b) {
+        b.status = 'Cancelled';
+        saveState();
+        render();
+        showToast(`Booking ${b.id} cancelled`);
+      }
+    }
+
+    function renderCustomerProfileScreen() {
+      const savedSalons = appState.salons.filter(s => appState.customer.savedSalonIds.includes(s.id));
+      return `
+        <div class="p-5 space-y-5">
+          <div class="bg-white rounded-[24px] border border-sand p-4 shadow-card space-y-3">
+            <div class="flex items-center gap-3.5">
+              <div class="w-14 h-14 rounded-full bg-espresso text-champagne font-serif-editorial text-2xl font-bold flex items-center justify-center">
+                ${appState.customer.name.charAt(0)}
+              </div>
+              <div>
+                <h1 class="font-serif-editorial text-2xl font-semibold text-espresso">${appState.customer.name}</h1>
+                <div class="text-xs text-taupe">${appState.customer.email}</div>
+                <div class="text-[11px] text-champagneDark font-medium">${appState.customer.city}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-sand p-4 flex items-center justify-between">
+            <span class="text-xs font-semibold text-espresso">${t('languageLabel')}</span>
+            <div class="flex gap-1.5">
+              <button onclick="setLanguage('en')" class="px-3 py-1 rounded-full text-xs font-semibold ${appState.language === 'en' ? 'bg-espresso text-ivory' : 'bg-beige text-espresso'}">EN</button>
+              <button onclick="setLanguage('hr')" class="px-3 py-1 rounded-full text-xs font-semibold ${appState.language === 'hr' ? 'bg-espresso text-ivory' : 'bg-beige text-espresso'}">HR</button>
+            </div>
+          </div>
+
+          <div class="space-y-2.5">
+            <h2 class="font-serif-editorial text-xl font-semibold text-espresso">Saved Ateliers (${savedSalons.length})</h2>
+            ${savedSalons.length === 0 ? `
+              <div class="bg-white rounded-2xl border border-sand p-4 text-xs text-taupe">No saved salons yet.</div>
+            ` : savedSalons.map(s => `
+              <div onclick="openSalonProfile('${s.id}')" class="bg-white rounded-2xl border border-sand p-3.5 flex items-center justify-between cursor-pointer hover:border-champagne">
+                <div>
+                  <div class="text-xs font-bold text-espresso">${s.name}</div>
+                  <div class="text-[11px] text-taupe">${s.city} • ★ ${s.rating}</div>
+                </div>
+                <span class="text-xs font-semibold text-champagneDark">View →</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="space-y-2 pt-2">
+            <button onclick="navigateTo('salonRegister')" class="w-full py-3 rounded-2xl bg-beige border border-sand text-xs font-semibold text-espresso hover:bg-sand/60 transition">
+              Switch to Salon Owner • ${t('freeTrialBadge')}
+            </button>
+            <button onclick="resetDemoData()" class="w-full py-2.5 text-xs font-semibold text-taupe hover:text-espresso transition">
+              ${t('resetDemo')}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 5. SCREENS 11–16: SALON OWNER PORTAL (30-DAY FREE TRIAL + EUR/KM PLANS)
+    // =========================================================================
+    function renderSalonRegisterScreen() {
+      const plans = appState.platformOwner.plans;
+      const selectedPlanId = appState.draftPlanId || 'pro';
+
+      return `
+        <div class="p-5 space-y-5">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-900/10 text-emerald-950 text-[10px] font-bold uppercase tracking-wider mb-1.5">
+              <span>✦ ${t('freeTrialBadge')} • 0 € / 0 KM Today</span>
+            </div>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">Register Your Salon</h1>
+            <p class="text-xs text-taupe mt-1">Start with 30 days completely free — no upfront payment required during the first month.</p>
+          </div>
+
+          <form onsubmit="event.preventDefault(); handleCreateSalon(this);" class="space-y-4">
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">Salon / Atelier Name</label>
+              <input name="name" type="text" placeholder="e.g. Studio Aurelia Beauty" required class="w-full px-4 py-3 rounded-2xl bg-white border border-sand text-sm text-espresso" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">City</label>
+                <input name="city" type="text" placeholder="e.g. Mostar / Split" required class="w-full px-4 py-3 rounded-2xl bg-white border border-sand text-sm text-espresso" />
+              </div>
+              <div>
+                <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">Primary Category</label>
+                <select name="category" class="w-full px-3.5 py-3 rounded-2xl bg-white border border-sand text-sm text-espresso">
+                  <option value="Hair">Hair</option>
+                  <option value="Aesthetics">Aesthetics</option>
+                  <option value="Nails">Nails</option>
+                  <option value="Spa & Massage">Spa & Massage</option>
+                  <option value="Brows & Lashes">Brows & Lashes</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-1">Street Address</label>
+              <input name="address" type="text" placeholder="e.g. Kralja Petra Krešimira IV 9" required class="w-full px-4 py-3 rounded-2xl bg-white border border-sand text-sm text-espresso" />
+            </div>
+
+            <div class="pt-2">
+              <label class="block text-[11px] uppercase tracking-wider font-semibold text-taupe mb-2">
+                Choose Plan After 30-Day Free Trial (EUR / KM per month)
+              </label>
+              <div class="space-y-2.5">
+                ${plans.map(p => {
+                  const active = selectedPlanId === p.id;
+                  return `
+                    <div onclick="appState.draftPlanId='${p.id}'; render();" class="p-4 rounded-2xl border transition cursor-pointer ${active ? 'bg-espresso text-ivory border-espresso shadow-luxury' : 'bg-white text-espresso border-sand'}">
+                      <div class="flex items-center justify-between gap-2">
+                        <div>
+                          <div class="flex items-center gap-2">
+                            <span class="font-serif-editorial text-xl font-semibold">${p.name}</span>
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${active ? 'bg-champagne text-espresso' : 'bg-beige text-espresso'}">30d Free</span>
+                          </div>
+                          <div class="text-[11px] ${active ? 'text-ivory/75' : 'text-taupe'} mt-0.5">${p.features.join(' • ')}</div>
+                        </div>
+                        <div class="text-right shrink-0">
+                          <div class="font-serif-editorial text-2xl font-bold ${active ? 'text-champagne' : 'text-espresso'}">${p.priceEur} €</div>
+                          <div class="text-[11px] font-semibold ${active ? 'text-ivory/85' : 'text-taupe'}">${p.priceKm} KM / mj.</div>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <div class="bg-beige/80 border border-sand rounded-2xl p-3 text-[11px] text-taupe">
+              <strong>30-Day Trial Guarantee:</strong> Your salon starts immediately on a 30-day free trial (2026-11-20 to 2026-12-20). When the monthly subscription activates after trial, payments route directly to <strong>${appState.platformOwner.companyName}</strong>.
+            </div>
+
+            <button type="submit" class="w-full py-4 rounded-2xl bg-espresso text-ivory text-sm font-medium tracking-wide shadow-luxury hover:bg-espresso/90 transition">
+              Start 30-Day Free Trial & Open Dashboard →
+            </button>
+          </form>
+        </div>
+      `;
+    }
+
+    function handleCreateSalon(form) {
+      const fd = new FormData(form);
+      const planId = appState.draftPlanId || 'pro';
+      const planObj = appState.platformOwner.plans.find(p => p.id === planId) || appState.platformOwner.plans[1];
+      const newId = 'salon-' + Date.now();
+      const salonName = fd.get('name');
+      const city = fd.get('city');
+
+      const newSalon = {
+        id: newId,
+        name: salonName,
+        tagline: 'Curated Luxury Beauty & Bespoke Care',
+        city: city,
+        country: 'Bosnia & Herzegovina / Croatia',
+        address: fd.get('address'),
+        rating: 5.0,
+        reviewsCount: 1,
+        priceTier: '€€€',
+        availableToday: true,
+        categories: [fd.get('category')],
+        planId: planObj.id,
+        monthlyFeeEur: planObj.priceEur,
+        monthlyFeeKm: planObj.priceKm,
+        trialStartDate: '2026-11-20',
+        trialEndDate: '2026-12-20',
+        trialDaysRemaining: 30,
+        trialTotalDays: 30,
+        trialExpired: false,
+        subscriptionStatus: 'Trial (30 Days Free)',
+        nextBillingDate: '2026-12-20',
+        coverImage: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80',
+        gallery: ['https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=900&q=80'],
+        bio: 'Newly launched partner atelier on VELORA enjoying a 30-day complimentary trial.',
+        hours: JSON.parse(JSON.stringify(appState.salons[0].hours)),
+        services: [
+          { id: 'srv-' + Date.now(), category: fd.get('category'), name: 'Signature Consultation & Treatment', duration: 60, price: 85, description: 'Bespoke luxury session tailored to your goals.', active: true }
+        ],
+        staff: [
+          { id: 'stf-' + Date.now(), name: 'Lead Specialist', role: 'Founder & Director', specialty: fd.get('category'), rating: 5.0, available: true, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80' }
+        ]
+      };
+
+      appState.salons.unshift(newSalon);
+      appState.ownerSalonId = newId;
+
+      saveState();
+      navigateTo('salonDashboard');
+      showToast(`${salonName} launched with 30 days free trial (${planObj.priceEur} € / ${planObj.priceKm} KM after trial)!`);
+    }
+
+    function renderSalonDashboardScreen() {
+      const salon = getOwnerSalon();
+      const salonBookings = appState.bookings.filter(b => b.salonId === salon.id && b.status !== 'Cancelled');
+      const todayBookings = salonBookings.filter(b => b.date === '2026-11-21');
+      const projectedToday = todayBookings.reduce((sum, b) => sum + Number(b.totalPrice), 0);
+      const trialDays = salon.trialDaysRemaining ?? 28;
+      const trialTotal = salon.trialTotalDays || 30;
+      const trialPct = Math.max(0, Math.min(100, Math.round((trialDays / trialTotal) * 100)));
+
+      return `
+        <div class="p-5 space-y-5">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] uppercase tracking-widest text-champagneDark font-semibold">Salon Partner Suite</span>
+              <h1 class="font-serif-editorial text-2xl font-semibold text-espresso leading-tight">${salon.name}</h1>
+            </div>
+            <select onchange="appState.ownerSalonId=this.value; render();" aria-label="Switch managed salon" class="bg-beige border border-sand rounded-full px-3 py-1.5 text-xs font-semibold text-espresso max-w-[155px] truncate">
+              ${appState.salons.map(s => `<option value="${s.id}" ${s.id === salon.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+            </select>
+          </div>
+
+          ${salon.trialExpired ? `
+            <div class="bg-espresso text-ivory rounded-[24px] p-4 border border-champagne/60 shadow-luxury space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+                  Trial Expired
+                </span>
+                <span class="text-xs font-semibold text-champagne">${salon.monthlyFeeEur} € / ${salon.monthlyFeeKm} KM mj.</span>
+              </div>
+              <div>
+                <h2 class="font-serif-editorial text-2xl font-semibold leading-snug">${t('trialEndedTitle')}</h2>
+                <p class="text-xs text-ivory/80 mt-1">${t('trialEndedSub')}</p>
+              </div>
+              <div class="flex gap-2 pt-1">
+                <button onclick="activateSalonSubscription()" class="flex-1 py-2.5 px-3 rounded-xl bg-champagne text-espresso text-xs font-bold hover:bg-champagne/90 transition">
+                  ${t('activatePlanBtn')}
+                </button>
+                <button onclick="toggleDemoTrialState()" class="px-3 py-2.5 rounded-xl bg-ivory/10 text-ivory text-[11px] font-medium hover:bg-ivory/20 transition">
+                  Restore Trial
+                </button>
+              </div>
+            </div>
+          ` : `
+            <div class="bg-white rounded-[24px] border border-champagne/50 p-4 shadow-card space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-900/10 text-emerald-950 text-[10px] font-bold uppercase tracking-wider">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-700"></span>
+                  ${t('freeTrialBadge')}
+                </span>
+                <span class="text-xs font-bold text-espresso">${trialDays} / ${trialTotal} ${t('trialDaysLeft')}</span>
+              </div>
+              <div class="w-full h-2 bg-beige rounded-full overflow-hidden">
+                <div class="h-full bg-champagne rounded-full transition-all duration-300" style="width: ${trialPct}%"></div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] pt-0.5">
+                <span class="text-taupe">Ends ${salon.trialEndDate} • Next: <strong class="text-espresso">${salon.monthlyFeeEur} € / ${salon.monthlyFeeKm} KM</strong></span>
+                <button onclick="toggleDemoTrialState()" class="text-[10px] font-semibold text-champagneDark underline hover:text-espresso">
+                  Simulate Trial End
+                </button>
+              </div>
+            </div>
+          `}
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white rounded-2xl border border-sand p-4 shadow-card">
+              <span class="text-[10px] uppercase tracking-wider text-taupe font-semibold">${t('todayAppts')}</span>
+              <div class="font-serif-editorial text-3xl font-bold text-espresso mt-1">${todayBookings.length}</div>
+              <span class="text-[11px] text-emerald-800 font-medium">Sat, 21 Nov</span>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-sand p-4 shadow-card">
+              <span class="text-[10px] uppercase tracking-wider text-taupe font-semibold">${t('projectedRev')}</span>
+              <div class="font-serif-editorial text-3xl font-bold text-espresso mt-1">€${projectedToday}</div>
+              <span class="text-[11px] text-taupe">Client bookings</span>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-sand p-4 shadow-card">
+              <span class="text-[10px] uppercase tracking-wider text-taupe font-semibold">${t('occupancy')}</span>
+              <div class="font-serif-editorial text-3xl font-bold text-espresso mt-1">84%</div>
+              <span class="text-[11px] text-champagneDark font-medium">+6% vs last week</span>
+            </div>
+
+            <div onclick="navigateTo('businessSettings')" class="bg-espresso text-ivory rounded-2xl p-4 shadow-card cursor-pointer">
+              <span class="text-[10px] uppercase tracking-wider text-champagne font-semibold">${t('subscriptionPlan')}</span>
+              <div class="font-serif-editorial text-2xl font-bold mt-1">${salon.monthlyFeeEur} € <span class="text-xs font-sans font-normal text-ivory/75">/ ${salon.monthlyFeeKm} KM</span></div>
+              <span class="text-[11px] text-ivory/80 underline">Manage billing →</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="navigateTo('bookingCalendar')" class="py-3 px-2 rounded-2xl bg-beige border border-sand text-[11px] font-semibold text-espresso hover:bg-sand/60 transition">📅 Calendar</button>
+            <button onclick="navigateTo('servicesManage')" class="py-3 px-2 rounded-2xl bg-beige border border-sand text-[11px] font-semibold text-espresso hover:bg-sand/60 transition">✨ Services</button>
+            <button onclick="navigateTo('salonRegister')" class="py-3 px-2 rounded-2xl bg-beige border border-sand text-[11px] font-semibold text-espresso hover:bg-sand/60 transition">+ New Salon</button>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2.5">
+              <h2 class="font-serif-editorial text-xl font-semibold text-espresso">Today's Schedule</h2>
+              <button onclick="navigateTo('bookingCalendar')" class="text-xs font-semibold text-champagneDark">Full Calendar →</button>
+            </div>
+            <div class="space-y-2.5">
+              ${todayBookings.length === 0 ? `
+                <div class="bg-white rounded-2xl border border-sand p-5 text-center text-xs text-taupe">No appointments scheduled for today yet.</div>
+              ` : todayBookings.map(b => `
+                <div class="bg-white rounded-2xl border border-sand p-3.5 flex items-center justify-between shadow-card">
+                  <div class="flex items-center gap-3">
+                    <div class="px-2.5 py-2 rounded-xl bg-beige text-center min-w-[54px]">
+                      <div class="text-xs font-bold text-espresso">${b.time}</div>
+                      <div class="text-[9px] text-taupe">${b.duration}m</div>
+                    </div>
+                    <div>
+                      <div class="text-xs font-bold text-espresso">${b.clientName}</div>
+                      <div class="text-[11px] text-taupe">${b.serviceNames.join(', ')}</div>
+                      <div class="text-[10px] text-champagneDark font-medium">with ${b.specialistName}</div>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs font-bold text-espresso">€${b.totalPrice}</div>
+                    <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-semibold ${b.status === 'Confirmed' ? 'bg-emerald-900/10 text-emerald-900' : 'bg-amber-900/10 text-amber-900'}">${b.status}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleDemoTrialState() {
+      const salon = getOwnerSalon();
+      if (!salon) return;
+      salon.trialExpired = !salon.trialExpired;
+      if (salon.trialExpired) {
+        salon.trialDaysRemaining = 0;
+        salon.subscriptionStatus = 'Trial Ended — Action Needed';
+        showToast('Previewing: 30-day free trial ended state');
+      } else {
+        salon.trialDaysRemaining = 28;
+        salon.subscriptionStatus = 'Trial (30 Days Free)';
+        showToast('Previewing: Active 30-day free trial (28 days left)');
+      }
+      saveState();
+      render();
+    }
+
+    function activateSalonSubscription() {
+      const salon = getOwnerSalon();
+      if (!salon) return;
+      salon.trialExpired = false;
+      salon.trialDaysRemaining = 30;
+      salon.subscriptionStatus = 'Active Paid Plan';
+      appState.platformOwner.invoices.unshift({
+        id: 'INV-2026-' + Math.floor(1300 + Math.random() * 690),
+        salon: salon.name,
+        city: salon.city,
+        plan: salon.planId.toUpperCase(),
+        amountEur: salon.monthlyFeeEur,
+        amountKm: salon.monthlyFeeKm,
+        date: '2026-11-20',
+        status: 'Paid to Owner'
+      });
+      saveState();
+      render();
+      showToast(`Subscription activated (${salon.monthlyFeeEur} € / ${salon.monthlyFeeKm} KM)`);
+    }
+
+    function renderServicesManageScreen() {
+      const salon = getOwnerSalon();
+      return `
+        <div class="p-5 space-y-5">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">Services Menu</h1>
+              <p class="text-xs text-taupe">${salon.name}</p>
+            </div>
+            <button onclick="openAddServiceModal()" class="px-3.5 py-2 rounded-full bg-espresso text-ivory text-xs font-semibold shadow-sm">${t('addService')}</button>
+          </div>
+
+          <div class="space-y-2.5">
+            ${salon.services.map(srv => `
+              <div class="bg-white rounded-2xl border border-sand p-4 flex items-center justify-between gap-3 shadow-card">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-espresso">${srv.name}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold ${srv.active ? 'bg-emerald-900/10 text-emerald-900' : 'bg-beige text-taupe'}">${srv.active ? 'Active' : 'Hidden'}</span>
+                  </div>
+                  <div class="text-[11px] text-taupe mt-0.5">${srv.category} • ${srv.duration} min • <strong>€${srv.price}</strong></div>
+                </div>
+                <button onclick="toggleSalonServiceActive('${srv.id}')" class="px-3 py-1.5 rounded-xl bg-beige text-espresso text-xs font-semibold hover:bg-sand">
+                  ${srv.active ? 'Hide' : 'Enable'}
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function openAddServiceModal() {
+      openModal(`
+        <form onsubmit="event.preventDefault(); addSalonService(this);" class="space-y-3.5">
+          <h3 class="font-serif-editorial text-2xl font-semibold text-espresso">Add New Service</h3>
+          <div>
+            <label class="block text-[10px] uppercase font-semibold text-taupe mb-1">Service Name</label>
+            <input name="name" type="text" placeholder="e.g. Silk Keratin Infusion" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-sand text-xs" />
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[10px] uppercase font-semibold text-taupe mb-1">Category</label>
+              <input name="category" type="text" value="Hair" required class="w-full px-3 py-2 rounded-xl bg-white border border-sand text-xs" />
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase font-semibold text-taupe mb-1">Duration (m)</label>
+              <input name="duration" type="number" value="60" min="15" required class="w-full px-3 py-2 rounded-xl bg-white border border-sand text-xs" />
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase font-semibold text-taupe mb-1">Price (€)</label>
+              <input name="price" type="number" value="75" min="5" required class="w-full px-3 py-2 rounded-xl bg-white border border-sand text-xs" />
+            </div>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button type="button" onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-beige text-espresso text-xs font-semibold">Cancel</button>
+            <button type="submit" class="flex-1 py-2.5 rounded-xl bg-espresso text-ivory text-xs font-semibold">Add Service</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function addSalonService(form) {
+      const fd = new FormData(form);
+      const salon = getOwnerSalon();
+      salon.services.unshift({
+        id: 'srv-' + Date.now(),
+        name: fd.get('name'),
+        category: fd.get('category'),
+        duration: Number(fd.get('duration')),
+        price: Number(fd.get('price')),
+        description: 'Bespoke treatment managed in VELORA partner portal.',
+        active: true
+      });
+      saveState();
+      closeModal();
+      render();
+      showToast('Service added to salon menu');
+    }
+
+    function toggleSalonServiceActive(serviceId) {
+      const salon = getOwnerSalon();
+      const srv = salon.services.find(s => s.id === serviceId);
+      if (srv) {
+        srv.active = !srv.active;
+        saveState();
+        render();
+        showToast('Service visibility updated');
+      }
+    }
+
+    function renderStaffManageScreen() {
+      const salon = getOwnerSalon();
+      return `
+        <div class="p-5 space-y-5">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">Specialists & Team</h1>
+              <p class="text-xs text-taupe">${salon.name}</p>
+            </div>
+            <button onclick="openAddStaffModal()" class="px-3.5 py-2 rounded-full bg-espresso text-ivory text-xs font-semibold shadow-sm">${t('addStaff')}</button>
+          </div>
+
+          <div class="space-y-2.5">
+            ${salon.staff.map(stf => `
+              <div class="bg-white rounded-2xl border border-sand p-3.5 flex items-center justify-between gap-3 shadow-card">
+                <div class="flex items-center gap-3">
+                  <img src="${stf.avatar}" alt="${stf.name}" onerror="imgFallback(this)" class="w-12 h-12 rounded-full object-cover border border-sand" />
+                  <div>
+                    <div class="text-xs font-bold text-espresso">${stf.name}</div>
+                    <div class="text-[11px] text-taupe">${stf.role} • ${stf.specialty}</div>
+                    <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-semibold ${stf.available ? 'bg-emerald-900/10 text-emerald-900' : 'bg-beige text-taupe'}">${stf.available ? 'Accepting Bookings' : 'Off Duty'}</span>
+                  </div>
+                </div>
+                <button onclick="toggleStaffAvailability('${stf.id}')" class="px-3 py-1.5 rounded-xl bg-beige text-espresso text-xs font-semibold hover:bg-sand">Toggle</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function openAddStaffModal() {
+      openModal(`
+        <form onsubmit="event.preventDefault(); addSalonStaff(this);" class="space-y-3.5">
+          <h3 class="font-serif-editorial text-2xl font-semibold text-espresso">Add Specialist</h3>
+          <div>
+            <label class="block text-[10px] uppercase font-semibold text-taupe mb-1">Full Name</label>
+            <input name="name" type="text" placeholder="e.g. Mia Kovač" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-sand text-xs" />
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] uppercase font-semibold text-taupe mb-1">Role</label>
+              <input name="role" type="text" value="Senior Stylist" required class="w-full px-3 py-2 rounded-xl bg-white border border-sand text-xs" />
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase font-semibold text-taupe mb-1">Specialty</label>
+              <input name="specialty" type="text" value="Hair & Color" required class="w-full px-3 py-2 rounded-xl bg-white border border-sand text-xs" />
+            </div>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button type="button" onclick="closeModal()" class="flex-1 py-2.5 rounded-xl bg-beige text-espresso text-xs font-semibold">Cancel</button>
+            <button type="submit" class="flex-1 py-2.5 rounded-xl bg-espresso text-ivory text-xs font-semibold">Save Specialist</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function addSalonStaff(form) {
+      const fd = new FormData(form);
+      const salon = getOwnerSalon();
+      salon.staff.push({
+        id: 'stf-' + Date.now(),
+        name: fd.get('name'),
+        role: fd.get('role'),
+        specialty: fd.get('specialty'),
+        rating: 4.9,
+        available: true,
+        avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80'
+      });
+      saveState();
+      closeModal();
+      render();
+      showToast('Specialist added to team');
+    }
+
+    function toggleStaffAvailability(staffId) {
+      const salon = getOwnerSalon();
+      const stf = salon.staff.find(s => s.id === staffId);
+      if (stf) {
+        stf.available = !stf.available;
+        saveState();
+        render();
+        showToast('Specialist availability updated');
+      }
+    }
+
+    function renderBookingCalendarScreen() {
+      const salon = getOwnerSalon();
+      const selectedDate = appState.calendarSelectedDate || '2026-11-21';
+      const dayBookings = appState.bookings.filter(b => b.salonId === salon.id && b.date === selectedDate);
+
+      return `
+        <div class="p-5 space-y-5">
+          <div>
+            <span class="text-[10px] uppercase tracking-widest text-champagneDark font-semibold">${salon.name}</span>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">Booking Calendar</h1>
+          </div>
+
+          <div class="flex items-center justify-between bg-white rounded-2xl border border-sand p-3">
+            <span class="text-xs font-semibold text-espresso">Selected Date:</span>
+            <input type="date" value="${selectedDate}" onchange="appState.calendarSelectedDate=this.value; render();" class="px-3 py-1.5 rounded-xl bg-beige border border-sand text-xs font-semibold text-espresso" />
+          </div>
+
+          <div class="space-y-2.5">
+            ${dayBookings.length === 0 ? `
+              <div class="bg-white rounded-2xl border border-sand p-6 text-center text-xs text-taupe">No appointments on ${selectedDate}.</div>
+            ` : dayBookings.map(b => `
+              <div class="bg-white rounded-2xl border border-sand p-4 space-y-2.5 shadow-card">
+                <div class="flex items-center justify-between">
+                  <div class="text-xs font-bold text-espresso">${b.time} • ${b.clientName}</div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${b.status === 'Confirmed' ? 'bg-emerald-900/10 text-emerald-900' : b.status === 'Cancelled' ? 'bg-rose-900/10 text-rose-900' : 'bg-amber-900/10 text-amber-900'}">${b.status}</span>
+                </div>
+                <div class="text-[11px] text-taupe">${b.serviceNames.join(', ')} — <strong>${b.specialistName}</strong> (€${b.totalPrice})</div>
+                ${b.status !== 'Cancelled' ? `
+                  <div class="flex gap-2 pt-1">
+                    <button onclick="setBookingStatus('${b.id}', 'Confirmed')" class="flex-1 py-1.5 rounded-xl bg-beige text-espresso text-[11px] font-semibold hover:bg-sand">Confirm</button>
+                    <button onclick="setBookingStatus('${b.id}', 'Completed')" class="flex-1 py-1.5 rounded-xl bg-espresso text-ivory text-[11px] font-semibold hover:bg-espresso/90">Complete</button>
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function setBookingStatus(bookingId, status) {
+      const b = appState.bookings.find(item => item.id === bookingId);
+      if (b) {
+        b.status = status;
+        saveState();
+        render();
+        showToast(`Booking ${b.id} marked as ${status}`);
+      }
+    }
+
+    function renderBusinessSettingsScreen() {
+      const salon = getOwnerSalon();
+      const plans = appState.platformOwner.plans;
+      const trialDays = salon.trialDaysRemaining ?? 28;
+      const trialTotal = salon.trialTotalDays || 30;
+      const trialPct = Math.max(0, Math.min(100, Math.round((trialDays / trialTotal) * 100)));
+
+      return `
+        <div class="p-5 space-y-5">
+          <div>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso">Business & Billing</h1>
+            <p class="text-xs text-taupe">Working hours, 30-day trial status & EUR / KM monthly plan</p>
+          </div>
+
+          <div class="bg-espresso text-ivory rounded-[24px] p-5 shadow-luxury space-y-3.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase tracking-[0.2em] text-champagne font-semibold">VELORA SaaS Membership</span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${salon.trialExpired ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}">
+                ● ${salon.subscriptionStatus}
+              </span>
+            </div>
+
+            <div class="flex items-baseline justify-between">
+              <div>
+                <h2 class="font-serif-editorial text-2xl font-semibold capitalize">${salon.planId} Plan</h2>
+                <p class="text-[11px] text-ivory/75">
+                  ${salon.trialExpired
+                    ? 'Free trial completed — activate monthly plan to continue'
+                    : `Free trial active (${trialDays}/${trialTotal} days left • ends ${salon.trialEndDate})`}
+                </p>
+              </div>
+              <div class="text-right">
+                <span class="font-serif-editorial text-3xl font-bold text-champagne">${salon.monthlyFeeEur} €</span>
+                <span class="text-[11px] font-semibold text-ivory/85 block">${salon.monthlyFeeKm} KM / mj.</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="w-full h-2 bg-ivory/15 rounded-full overflow-hidden">
+                <div class="h-full bg-champagne rounded-full transition-all duration-300" style="width: ${salon.trialExpired ? 0 : trialPct}%"></div>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-ivory/70 mt-1.5">
+                <span>Trial start: ${salon.trialStartDate || '2026-11-18'}</span>
+                <button onclick="toggleDemoTrialState()" class="text-champagne underline font-semibold">
+                  ${salon.trialExpired ? 'Preview Active Trial' : 'Preview Trial Ended'}
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-ivory/15 flex flex-wrap gap-2">
+              ${plans.map(p => `
+                <button onclick="changeSalonPlan('${p.id}')" class="px-3 py-1.5 rounded-xl text-[11px] font-semibold transition ${salon.planId === p.id ? 'bg-champagne text-espresso' : 'bg-ivory/10 text-ivory hover:bg-ivory/20'}">
+                  ${p.name.split('/')[0].trim()} (${p.priceEur} € / ${p.priceKm} KM)
+                </button>
+              `).join('')}
+            </div>
+
+            <div class="pt-1">
+              <button onclick="navigateTo('platformRevenue')" class="w-full py-2.5 rounded-xl bg-ivory/10 hover:bg-ivory/15 text-[11px] text-champagne font-semibold transition">
+                View Platform Owner Direct Payout Treasury →
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-[24px] border border-sand p-4 space-y-3 shadow-card">
+            <h3 class="font-serif-editorial text-xl font-semibold text-espresso">Working Hours</h3>
+            <div class="space-y-2">
+              ${salon.hours.map((h, idx) => `
+                <div class="flex items-center justify-between text-xs py-1.5 border-b border-sand/50 last:border-0">
+                  <div class="flex items-center gap-2.5">
+                    <input type="checkbox" ${h.active ? 'checked' : ''} onchange="toggleSalonDay(${idx})" class="accent-espresso w-4 h-4 rounded" />
+                    <span class="font-medium ${h.active ? 'text-espresso' : 'text-taupe'}">${h.day}</span>
+                  </div>
+                  <span class="text-taupe font-medium">${h.active ? `${h.open} – ${h.close}` : 'Closed'}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-sand p-4 flex items-center justify-between">
+            <span class="text-xs font-medium text-espresso">${t('languageLabel')}</span>
+            <div class="flex gap-1.5">
+              <button onclick="setLanguage('en')" class="px-3 py-1 rounded-full text-xs font-semibold ${appState.language === 'en' ? 'bg-espresso text-ivory' : 'bg-beige text-espresso'}">EN</button>
+              <button onclick="setLanguage('hr')" class="px-3 py-1 rounded-full text-xs font-semibold ${appState.language === 'hr' ? 'bg-espresso text-ivory' : 'bg-beige text-espresso'}">HR</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleSalonDay(dayIndex) {
+      const salon = getOwnerSalon();
+      salon.hours[dayIndex].active = !salon.hours[dayIndex].active;
+      saveState();
+      render();
+      showToast('Working hours updated');
+    }
+
+    function changeSalonPlan(planId) {
+      const salon = getOwnerSalon();
+      const plan = appState.platformOwner.plans.find(p => p.id === planId);
+      if (salon && plan) {
+        salon.planId = plan.id;
+        salon.monthlyFeeEur = plan.priceEur;
+        salon.monthlyFeeKm = plan.priceKm;
+        saveState();
+        render();
+        showToast(`Plan updated to ${plan.name} (${plan.priceEur} € / ${plan.priceKm} KM mj.)`);
+      }
+    }
+
+    // =========================================================================
+    // 6. PLATFORM OWNER DIRECT SUBSCRIPTION REVENUE & PAYOUT TREASURY
+    // =========================================================================
+    function renderPlatformRevenueScreen() {
+      const po = appState.platformOwner;
+      const activeSalons = appState.salons.filter(s => !s.trialExpired);
+      const totalMRREur = activeSalons.reduce((sum, s) => sum + Number(s.monthlyFeeEur || 39), 0);
+      const totalMRRKm = activeSalons.reduce((sum, s) => sum + Number(s.monthlyFeeKm || 76), 0);
+      const projectedARREur = totalMRREur * 12;
+
+      return `
+        <div class="p-5 space-y-5">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase tracking-[0.2em] text-champagneDark font-bold">Platform Owner Treasury</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-espresso text-champagne text-[10px] font-semibold">100% Owner Revenue</span>
+            </div>
+            <h1 class="font-serif-editorial text-3xl font-semibold text-espresso mt-0.5">SaaS Revenue & Direct Payouts</h1>
+            <p class="text-xs text-taupe mt-1">
+              New salons start with 30 days free, then pay their monthly EUR / KM subscription directly to your account.
+            </p>
+          </div>
+
+          <div class="bg-espresso text-ivory rounded-[26px] p-5 shadow-luxury space-y-4">
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="text-[10px] uppercase tracking-widest text-champagne">Monthly Recurring Revenue (MRR)</span>
+                <div class="font-serif-editorial text-4xl font-bold mt-1">${totalMRREur} € <span class="text-sm font-sans font-normal text-champagne">/ ${totalMRRKm} KM</span></div>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] uppercase tracking-widest text-ivory/70">Annual Run Rate</span>
+                <div class="font-serif-editorial text-xl font-semibold text-champagne mt-1">${projectedARREur.toLocaleString()} €</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-3 border-t border-ivory/15 text-xs">
+              <div>
+                <span class="text-ivory/65 block text-[10px] uppercase">Active Salons</span>
+                <span class="font-semibold text-sm">${activeSalons.length} of ${appState.salons.length} Ateliers</span>
+              </div>
+              <div>
+                <span class="text-ivory/65 block text-[10px] uppercase">Platform Commission</span>
+                <span class="font-semibold text-sm text-emerald-300">100% Net to Owner</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-[24px] border border-sand p-4 space-y-3.5 shadow-card">
+            <div class="flex items-center justify-between">
+              <h2 class="font-serif-editorial text-xl font-semibold text-espresso">Your Direct Payout Account</h2>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${po.stripeConnected ? 'bg-emerald-900/10 text-emerald-900' : 'bg-amber-900/10 text-amber-900'}">
+                ${po.stripeConnected ? 'Live Stripe Connected' : 'MVP Sandbox Mode'}
+              </span>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-semibold text-taupe mb-1">Beneficiary Company / Owner Name</label>
+                <input type="text" value="${po.companyName}" onchange="appState.platformOwner.companyName=this.value; saveState(); showToast('Beneficiary updated');" class="w-full px-3.5 py-2.5 rounded-xl bg-ivory border border-sand text-espresso font-medium" />
+              </div>
+
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-semibold text-taupe mb-1">Direct Payout IBAN (SEPA / BAM / International)</label>
+                <input type="text" value="${po.iban}" onchange="appState.platformOwner.iban=this.value; saveState(); showToast('Payout IBAN saved');" class="w-full px-3.5 py-2.5 rounded-xl bg-ivory border border-sand text-espresso font-mono" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[10px] uppercase tracking-wider font-semibold text-taupe mb-1">SWIFT / BIC</label>
+                  <input type="text" value="${po.swift}" onchange="appState.platformOwner.swift=this.value; saveState();" class="w-full px-3.5 py-2.5 rounded-xl bg-ivory border border-sand text-espresso font-mono" />
+                </div>
+                <div>
+                  <label class="block text-[10px] uppercase tracking-wider font-semibold text-taupe mb-1">Stripe Merchant ID</label>
+                  <input type="text" value="${po.stripeAccountId}" readonly class="w-full px-3.5 py-2.5 rounded-xl bg-beige border border-sand text-taupe font-mono text-[11px]" />
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-beige/80 border border-champagne/40 rounded-xl p-3 text-[11px] text-espresso leading-relaxed">
+              <strong>How Live Payouts Work:</strong> In this MVP preview, subscription invoices are simulated. When you connect your live <strong>Stripe Billing / Payment Link / Merchant API</strong> in production, every salon’s post-trial monthly subscription (19 € / 37 KM, 39 € / 76 KM, or 79 € / 154 KM) settles directly to your account above.
+            </div>
+
+            <button onclick="simulateMonthlyBillingRun()" class="w-full py-3.5 rounded-xl bg-espresso text-ivory text-xs font-semibold shadow-card hover:bg-espresso/90 transition">
+              Simulate Monthly Subscription Charge (+${totalMRREur} € / ${totalMRRKm} KM to IBAN)
+            </button>
+          </div>
+
+          <div>
+            <h3 class="font-serif-editorial text-xl font-semibold text-espresso mb-2.5">Monthly Salon Subscription Ledger</h3>
+            <div class="space-y-2.5">
+              ${po.invoices.map(inv => `
+                <div class="bg-white rounded-2xl border border-sand p-3.5 flex items-center justify-between shadow-card">
+                  <div>
+                    <div class="text-xs font-bold text-espresso">${inv.salon}</div>
+                    <div class="text-[11px] text-taupe">${inv.city} • ${inv.plan} (${inv.date})</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-serif-editorial text-lg font-bold text-emerald-900">+${inv.amountEur} €</div>
+                    <div class="text-[10px] font-semibold text-taupe">${inv.amountKm} KM • ${inv.status}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function simulateMonthlyBillingRun() {
+      const activeSalons = appState.salons.filter(s => !s.trialExpired);
+      const totalEur = activeSalons.reduce((sum, s) => sum + Number(s.monthlyFeeEur || 39), 0);
+      const totalKm = activeSalons.reduce((sum, s) => sum + Number(s.monthlyFeeKm || 76), 0);
+      activeSalons.forEach(s => {
+        appState.platformOwner.invoices.unshift({
+          id: 'INV-2026-' + Math.floor(1200 + Math.random() * 799),
+          salon: s.name,
+          city: s.city,
+          plan: s.planId.toUpperCase(),
+          amountEur: s.monthlyFeeEur,
+          amountKm: s.monthlyFeeKm,
+          date: '2026-11-20',
+          status: 'Paid to Owner'
+        });
+      });
+      saveState();
+      render();
+      showToast(`Simulated +${totalEur} € (${totalKm} KM) monthly SaaS payout to your IBAN!`);
+    }
+
+    // =========================================================================
+    // 7. MASTER RENDER ENGINE (HEADER, SCREEN DISPATCHER & BOTTOM NAV)
+    // =========================================================================
+    function render() {
+      const shell = document.getElementById('app-shell');
+      if (shell) {
+        if (appState.viewportMode === 'desktop') {
+          shell.classList.remove('max-w-[440px]');
+          shell.classList.add('max-w-[960px]');
+        } else {
+          shell.classList.remove('max-w-[960px]');
+          shell.classList.add('max-w-[440px]');
+        }
+      }
+
+      const vpLabel = document.getElementById('viewport-label');
+      if (vpLabel) {
+        vpLabel.textContent = appState.viewportMode === 'mobile' ? 'Mobile Frame' : 'Wide View';
+      }
+
+      const langEnBtn = document.getElementById('lang-en');
+      const langHrBtn = document.getElementById('lang-hr');
+      if (langEnBtn && langHrBtn) {
+        langEnBtn.className = `px-2 py-0.5 rounded-full text-[11px] font-semibold transition ${appState.language === 'en' ? 'bg-espresso text-ivory' : 'text-espresso'}`;
+        langHrBtn.className = `px-2 py-0.5 rounded-full text-[11px] font-semibold transition ${appState.language === 'hr' ? 'bg-espresso text-ivory' : 'text-espresso'}`;
+      }
+
+      document.querySelectorAll('.role-pill').forEach(btn => {
+        btn.classList.remove('bg-espresso', 'text-ivory', 'shadow-sm');
+        btn.classList.add('text-espresso');
+      });
+      const activeRoleBtn = document.getElementById(`role-btn-${appState.role}`);
+      if (activeRoleBtn) {
+        activeRoleBtn.classList.remove('text-espresso');
+        activeRoleBtn.classList.add('bg-espresso', 'text-ivory', 'shadow-sm');
+      }
+
+      const backBtn = document.getElementById('header-back-btn');
+      if (backBtn) {
+        const showBack = !['welcome', 'home', 'salonDashboard', 'platformRevenue'].includes(appState.currentScreen);
+        backBtn.classList.toggle('hidden', !showBack);
+      }
+
+      const navSelect = document.getElementById('screen-navigator');
+      if (navSelect && navSelect.value !== appState.currentScreen) {
+        navSelect.value = appState.currentScreen;
+      }
+
+      const container = document.getElementById('screen-container');
+      const screenMap = {
+        welcome: renderWelcomeScreen,
+        auth: renderAuthScreen,
+        home: renderCustomerHomeScreen,
+        search: renderSearchScreen,
+        salonProfile: renderSalonProfileScreen,
+        servicesMenu: renderServicesMenuScreen,
+        dateTime: renderDateTimeScreen,
+        bookingConfirm: renderBookingConfirmScreen,
+        myBookings: renderMyBookingsScreen,
+        customerProfile: renderCustomerProfileScreen,
+        salonRegister: renderSalonRegisterScreen,
+        salonDashboard: renderSalonDashboardScreen,
+        servicesManage: renderServicesManageScreen,
+        staffManage: renderStaffManageScreen,
+        bookingCalendar: renderBookingCalendarScreen,
+        businessSettings: renderBusinessSettingsScreen,
+        platformRevenue: renderPlatformRevenueScreen
+      };
+
+      const renderer = screenMap[appState.currentScreen] || renderCustomerHomeScreen;
+      container.innerHTML = `<div class="fade-in">${renderer()}</div>`;
+
+      renderBottomNav();
+    }
+
+    function renderBottomNav() {
+      const nav = document.getElementById('bottom-nav');
+      if (!nav) return;
+
+      if (appState.role === 'owner') {
+        const items = [
+          { id: 'salonDashboard', label: t('navDashboard'), icon: '◈' },
+          { id: 'bookingCalendar', label: t('navCalendar'), icon: '◷' },
+          { id: 'servicesManage', label: t('navServices'), icon: '✦' },
+          { id: 'staffManage', label: t('navStaff'), icon: '◉' },
+          { id: 'businessSettings', label: t('navSettings'), icon: '⚙' }
+        ];
+        nav.innerHTML = items.map(item => {
+          const active = appState.currentScreen === item.id;
+          return `
+            <button onclick="navigateTo('${item.id}')" class="flex flex-col items-center py-1 px-2 rounded-xl transition ${active ? 'text-espresso font-bold' : 'text-taupe hover:text-espresso'}">
+              <span class="text-base leading-none">${item.icon}</span>
+              <span class="text-[10px] mt-1">${item.label}</span>
+            </button>
+          `;
+        }).join('');
+      } else if (appState.role === 'platform') {
+        nav.innerHTML = `
+          <button onclick="navigateTo('platformRevenue')" class="flex-1 py-2 rounded-xl bg-espresso text-champagne text-xs font-semibold">★ Direct Payouts & MRR</button>
+          <button onclick="navigateTo('salonDashboard')" class="flex-1 py-2 rounded-xl bg-beige text-espresso text-xs font-semibold ml-2">Salon Portal →</button>
+        `;
+      } else {
+        const items = [
+          { id: 'home', label: t('navExplore'), icon: '✦' },
+          { id: 'search', label: t('navSearch'), icon: '⌕' },
+          { id: 'myBookings', label: t('navBookings'), icon: '◷' },
+          { id: 'customerProfile', label: t('navProfile'), icon: '◯' }
+        ];
+        nav.innerHTML = items.map(item => {
+          const active = appState.currentScreen === item.id;
+          return `
+            <button onclick="navigateTo('${item.id}')" class="flex flex-col items-center py-1 px-3 rounded-xl transition ${active ? 'text-espresso font-bold' : 'text-taupe hover:text-espresso'}">
+              <span class="text-base leading-none">${item.icon}</span>
+              <span class="text-[10px] mt-1">${item.label}</span>
+            </button>
+          `;
+        }).join('');
+      }
+    }
+
+    window.onload = function() {
+      render();
+    };
+  </script>
+</body>
+</html>
